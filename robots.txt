@@ -1,0 +1,14 @@
+# Разрешить всем роботам индексацию
+User-agent: *
+Allow: /
+
+# Запретить индексацию админки
+Disallow: /admin.html
+Disallow: /admin.css
+Disallow: /admin.js
+
+# Указать путь к карте сайта
+Sitemap: https://tecnopro.ru/sitemap.xml
+
+# Задержка для роботов (чтобы не нагружать сервер)
+Crawl-delay: 5
