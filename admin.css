@@ -8,9 +8,188 @@ body {
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     background: #f0f2f5;
     color: #1a2c3e;
+    transition: background 0.3s ease, color 0.3s ease;
 }
 
-/* ЛОГИН */
+/* ===== ТЁМНАЯ ТЕМА (ПОЛНОСТЬЮ ПЕРЕРАБОТАНА) ===== */
+body.dark-theme {
+    background: #0f0f1a;
+    color: #e0e0e0;
+}
+
+body.dark-theme .login-box {
+    background: #1a1a2e;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+}
+body.dark-theme .login-box h2 { color: #e0e0e0; }
+body.dark-theme .login-box input {
+    background: #16213e;
+    border-color: #2a3a5e;
+    color: #e0e0e0;
+}
+body.dark-theme .login-box input:focus { border-color: #00a8ff; }
+
+body.dark-theme .admin-container { background: transparent; }
+
+/* Карточки статистики */
+body.dark-theme .stat-card {
+    background: #1a1a2e;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+body.dark-theme .stat-info .stat-label { color: #94a3b8; }
+
+/* График */
+body.dark-theme .chart-container {
+    background: #1a1a2e;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+body.dark-theme .chart-header select {
+    background: #16213e;
+    border-color: #2a3a5e;
+    color: #e0e0e0;
+}
+
+/* Панель фильтров */
+body.dark-theme .filters-bar {
+    background: #1a1a2e;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+body.dark-theme .search-box,
+body.dark-theme .date-filter,
+body.dark-theme .type-filter,
+body.dark-theme .status-filter {
+    background: #16213e;
+}
+body.dark-theme .search-box i,
+body.dark-theme .date-filter i,
+body.dark-theme .type-filter i,
+body.dark-theme .status-filter i { color: #00a8ff; }
+body.dark-theme .search-box input,
+body.dark-theme .date-filter input,
+body.dark-theme select {
+    background: transparent;
+    color: #e0e0e0;
+}
+body.dark-theme .date-filter input::placeholder { color: #5a6e8a; }
+body.dark-theme .reset-btn {
+    background: #2a3a5e;
+    color: #e0e0e0;
+}
+body.dark-theme .reset-btn:hover { background: #3a4a6e; }
+
+/* Массовые действия */
+body.dark-theme .bulk-actions {
+    background: #1a1a2e;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+body.dark-theme .bulk-btn.cancel { background: #2a3a5e; color: #e0e0e0; }
+
+/* Таблица */
+body.dark-theme .requests-table-container {
+    background: #1a1a2e;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+body.dark-theme .requests-table th {
+    background: #0f0f1a;
+    color: #e0e0e0;
+    border-bottom-color: #2a3a5e;
+}
+body.dark-theme .requests-table td {
+    border-bottom-color: #2a3a5e;
+    color: #cbd5e1;
+}
+body.dark-theme .requests-table tr:hover { background: #16213e; }
+
+/* Статусы в тёмной теме */
+body.dark-theme .status-new { background: #422800; color: #f97316; }
+body.dark-theme .status-work { background: #1e3a5f; color: #60a5fa; }
+body.dark-theme .status-done { background: #064e3b; color: #34d399; }
+
+/* Кнопки действий */
+body.dark-theme .action-work { background: #1e3a5f; color: #60a5fa; }
+body.dark-theme .action-done { background: #064e3b; color: #34d399; }
+body.dark-theme .action-call { background: #1e3a5f; color: #60a5fa; }
+body.dark-theme .action-delete { background: #422800; color: #f97316; }
+body.dark-theme .action-comment { background: #2a1a4a; color: #a78bfa; }
+body.dark-theme .action-history { background: #1a2a3e; color: #00a8ff; }
+
+/* Пагинация */
+body.dark-theme .pagination button {
+    background: #1a1a2e;
+    border-color: #2a3a5e;
+    color: #e0e0e0;
+}
+body.dark-theme .pagination button:hover:not(:disabled) {
+    background: #00a8ff;
+    border-color: #00a8ff;
+    color: white;
+}
+
+/* Модальные окна */
+body.dark-theme .modal-comment-content,
+body.dark-theme .modal-history-content {
+    background: #1a1a2e;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+}
+body.dark-theme .modal-header h3 { color: #e0e0e0; }
+body.dark-theme .modal-close { color: #94a3b8; }
+body.dark-theme .modal-close:hover { color: #f97316; }
+body.dark-theme #commentText {
+    background: #16213e;
+    border-color: #2a3a5e;
+    color: #e0e0e0;
+}
+body.dark-theme .comment-history {
+    background: #0f0f1a;
+    color: #94a3b8;
+}
+body.dark-theme .btn-cancel {
+    background: #2a3a5e;
+    color: #e0e0e0;
+}
+body.dark-theme .btn-cancel:hover { background: #3a4a6e; }
+body.dark-theme .history-item {
+    border-bottom-color: #2a3a5e;
+    color: #cbd5e1;
+}
+body.dark-theme .history-item .history-date { color: #5a6e8a; }
+
+/* Верхняя панель */
+body.dark-theme .theme-toggle {
+    background: #16213e;
+    color: #e0e0e0;
+}
+body.dark-theme .theme-toggle:hover { background: #2a3a5e; }
+body.dark-theme .version {
+    background: #16213e;
+    color: #94a3b8;
+}
+body.dark-theme .notification-bell {
+    background: #16213e;
+    color: #e0e0e0;
+}
+body.dark-theme .logout-btn {
+    background: #16213e;
+    color: #e0e0e0;
+}
+body.dark-theme .logout-btn:hover { background: #2a3a5e; }
+
+/* Чекбоксы */
+body.dark-theme input[type="checkbox"] {
+    accent-color: #00a8ff;
+}
+
+/* Адаптив для тёмной темы — без изменений */
+@media (max-width: 900px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .filters-bar { flex-direction: column; align-items: stretch; border-radius: 24px; }
+    .search-box, .date-filter, .type-filter, .status-filter { width: 100%; }
+    .admin-header { flex-direction: column; align-items: flex-start; }
+    .chart-header { flex-direction: column; align-items: flex-start; }
+    .bulk-actions { justify-content: center; }
+}
+
+/* ===== ОСНОВНЫЕ СТИЛИ (СВЕТЛАЯ ТЕМА) ===== */
 .login-container {
     display: flex;
     justify-content: center;
@@ -31,10 +210,7 @@ body {
     color: #00a8ff;
     margin-bottom: 20px;
 }
-.login-box h2 {
-    margin-bottom: 24px;
-    color: #1a2c3e;
-}
+.login-box h2 { margin-bottom: 24px; }
 .login-box input {
     width: 100%;
     padding: 14px 18px;
@@ -62,7 +238,6 @@ body {
 .btn:hover { transform: translateY(-2px); }
 .error { color: #e67e22; margin-top: 12px; }
 
-/* АДМИНКА */
 .admin-container {
     max-width: 1600px;
     margin: 0 auto;
@@ -79,9 +254,19 @@ body {
 .header-left {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 20px;
 }
-.header-left h1 { font-size: 24px; color: #1a2c3e; }
+.theme-toggle {
+    background: #e2e8f0;
+    border-radius: 40px;
+    padding: 10px;
+    cursor: pointer;
+    width: 40px;
+    text-align: center;
+    transition: 0.2s;
+}
+.theme-toggle:hover { background: #cbd5e1; }
+.header-left h1 { font-size: 24px; }
 .header-left h1 i { color: #00a8ff; margin-right: 12px; }
 .version {
     background: #e2e8f0;
@@ -90,7 +275,26 @@ body {
     font-size: 12px;
     font-weight: 600;
 }
-.header-right { display: flex; gap: 12px; }
+.header-right { display: flex; gap: 12px; align-items: center; }
+.notification-bell {
+    position: relative;
+    background: #e2e8f0;
+    border-radius: 40px;
+    padding: 10px 14px;
+    cursor: pointer;
+}
+.notification-bell i { font-size: 18px; }
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #f97316;
+    color: white;
+    border-radius: 20px;
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: 600;
+}
 .export-btn, .logout-btn {
     padding: 10px 20px;
     border-radius: 40px;
@@ -99,18 +303,11 @@ body {
     border: none;
     transition: 0.2s;
 }
-.export-btn {
-    background: #10b981;
-    color: white;
-}
+.export-btn { background: #10b981; color: white; }
 .export-btn:hover { background: #059669; }
-.logout-btn {
-    background: #e2e8f0;
-    color: #1a2c3e;
-}
+.logout-btn { background: #e2e8f0; color: #1a2c3e; }
 .logout-btn:hover { background: #cbd5e1; }
 
-/* СТАТИСТИКА */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -119,7 +316,7 @@ body {
 }
 .stat-card {
     background: white;
-    border-radius: 28px;
+    border-radius: 24px;
     padding: 20px 24px;
     display: flex;
     align-items: center;
@@ -133,12 +330,31 @@ body {
 .stat-card.done i { color: #10b981; }
 .stat-info .stat-value { font-size: 32px; font-weight: 800; }
 .stat-info .stat-label { font-size: 14px; color: #5a6e8a; }
-.stat-card.total .stat-value { color: #1e4b8f; }
-.stat-card.new .stat-value { color: #f97316; }
-.stat-card.work .stat-value { color: #00a8ff; }
-.stat-card.done .stat-value { color: #10b981; }
 
-/* ФИЛЬТРЫ */
+.chart-container {
+    background: white;
+    border-radius: 24px;
+    padding: 20px;
+    margin-bottom: 28px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.chart-header h3 i { color: #00a8ff; margin-right: 8px; }
+.chart-header select {
+    padding: 8px 16px;
+    border-radius: 30px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    cursor: pointer;
+}
+
 .filters-bar {
     display: flex;
     flex-wrap: wrap;
@@ -148,6 +364,7 @@ body {
     padding: 16px 24px;
     border-radius: 48px;
     align-items: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 .search-box {
     flex: 2;
@@ -166,7 +383,7 @@ body {
     font-size: 14px;
 }
 .search-box input:focus { outline: none; }
-.date-filter, .type-filter {
+.date-filter, .type-filter, .status-filter {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -174,7 +391,12 @@ body {
     padding: 8px 16px;
     border-radius: 40px;
 }
-.date-filter i, .type-filter i { color: #00a8ff; }
+.date-filter input {
+    border: none;
+    background: none;
+    padding: 8px;
+    width: 120px;
+}
 select {
     border: none;
     background: none;
@@ -192,7 +414,30 @@ select {
 }
 .reset-btn:hover { background: #cbd5e1; }
 
-/* ТАБЛИЦА */
+.bulk-actions {
+    background: white;
+    border-radius: 48px;
+    padding: 12px 24px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.bulk-btn {
+    background: #00a8ff;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 40px;
+    cursor: pointer;
+    font-weight: 500;
+    color: white;
+}
+.bulk-btn.delete { background: #f97316; }
+.bulk-btn.cancel { background: #e2e8f0; color: #1a2c3e; }
+.bulk-btn:hover { opacity: 0.9; }
+
 .requests-table-container {
     background: white;
     border-radius: 24px;
@@ -202,27 +447,23 @@ select {
 .requests-table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 800px;
+    min-width: 1100px;
 }
 .requests-table th,
 .requests-table td {
-    padding: 16px 16px;
+    padding: 16px 12px;
     text-align: left;
     border-bottom: 1px solid #eef2ff;
 }
 .requests-table th {
     background: #f8fafd;
     font-weight: 600;
-    color: #1e3a5f;
     cursor: pointer;
-    user-select: none;
 }
 .requests-table th i { margin-left: 6px; opacity: 0.5; }
-.requests-table th:hover i { opacity: 1; }
 .requests-table tr:hover { background: #f8fafd; }
 .loading { text-align: center; padding: 40px; color: #94a3b8; }
 
-/* СТАТУСЫ */
 .status-badge {
     display: inline-block;
     padding: 5px 12px;
@@ -234,20 +475,18 @@ select {
 .status-work { background: #dbeafe; color: #2563eb; }
 .status-done { background: #d1fae5; color: #059669; }
 
-/* ДЕЙСТВИЯ */
 .action-buttons {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     flex-wrap: wrap;
 }
 .action-btn {
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 12px;
-    padding: 6px 12px;
-    border-radius: 40px;
-    font-weight: 500;
+    font-size: 14px;
+    padding: 6px 10px;
+    border-radius: 30px;
     transition: 0.2s;
 }
 .action-work { background: #dbeafe; color: #2563eb; }
@@ -255,9 +494,9 @@ select {
 .action-call { background: #e0f2fe; color: #0284c7; }
 .action-delete { background: #fee2e2; color: #dc2626; }
 .action-comment { background: #f3e8ff; color: #9333ea; }
+.action-history { background: #e2e8f0; color: #1e4b8f; }
 .action-btn:hover { opacity: 0.7; transform: scale(0.95); }
 
-/* ПАГИНАЦИЯ */
 .pagination {
     display: flex;
     justify-content: center;
@@ -282,13 +521,8 @@ select {
     color: white;
     border-color: #00a8ff;
 }
-#pageInfo {
-    font-size: 14px;
-    color: #5a6e8a;
-}
 
-/* МОДАЛКА КОММЕНТАРИЯ */
-.modal-comment {
+.modal-comment, .modal-history {
     display: none;
     position: fixed;
     top: 0;
@@ -301,32 +535,41 @@ select {
     align-items: center;
     justify-content: center;
 }
-.modal-comment.active { display: flex; }
-.modal-comment-content {
+.modal-comment.active, .modal-history.active { display: flex; }
+.modal-comment-content, .modal-history-content {
     background: white;
     border-radius: 32px;
-    width: 450px;
+    width: 520px;
     max-width: 90%;
     padding: 24px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.2);
 }
-.modal-comment-content .modal-header {
+.modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
 }
-.modal-comment-content textarea {
-    width: 100%;
-    padding: 14px;
-    border: 1px solid #e2e8f0;
-    border-radius: 20px;
-    font-family: inherit;
-    resize: vertical;
-    margin-bottom: 20px;
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+}
+.comment-history {
+    font-size: 12px;
+    color: #5a6e8a;
+    margin: 12px 0;
+    padding: 8px;
+    background: #f8fafd;
+    border-radius: 16px;
+    max-height: 150px;
+    overflow-y: auto;
 }
 .modal-buttons {
     display: flex;
     gap: 12px;
+    margin-top: 16px;
 }
 .btn-save, .btn-cancel {
     padding: 10px 20px;
@@ -335,27 +578,21 @@ select {
     border: none;
     font-weight: 500;
 }
-.btn-save {
-    background: #00a8ff;
-    color: white;
+.btn-save { background: #00a8ff; color: white; }
+.btn-cancel { background: #e2e8f0; color: #1a2c3e; }
+.history-list { max-height: 400px; overflow-y: auto; }
+.history-item {
+    padding: 12px;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 13px;
 }
-.btn-cancel {
-    background: #e2e8f0;
-    color: #1a2c3e;
-}
-.btn-save:hover { background: #0099e6; }
-.btn-cancel:hover { background: #cbd5e1; }
-.modal-close {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-}
+.history-item .history-date { color: #5a6e8a; font-size: 11px; margin-bottom: 4px; }
 
-/* АДАПТИВ */
-@media (max-width: 900px) {
-    .stats-grid { grid-template-columns: repeat(2, 1fr); }
-    .filters-bar { flex-direction: column; align-items: stretch; border-radius: 24px; }
-    .search-box, .date-filter, .type-filter { width: 100%; }
-    .admin-header { flex-direction: column; align-items: flex-start; }
+textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    font-family: inherit;
+    resize: vertical;
 }
