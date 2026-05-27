@@ -4,47 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     
-    <!-- SEO -->
-    <title>TecnoPro | Нано-ремонт телефонов и игровых приставок в Волжском</title>
-    <meta name="description" content="Ремонт телефонов и игровых приставок в Волжском с гарантией 12 месяцев. Диагностика 0 ₽. Быстрый ремонт за 60 минут. Адрес: пр-т Дружбы, 99Д">
-    <meta name="keywords" content="ремонт телефонов Волжский, ремонт приставок Волжский, ремонт iPhone, ремонт Samsung, ремонт PlayStation, ремонт Xbox, замена экрана, замена аккумулятора, нано-ремонт, TecnoPro">
-    <meta name="author" content="TecnoPro">
+    <title>Технопро | Нано-ремонт телефонов и приставок в Волжском</title>
+    <meta name="description" content="Ремонт телефонов и игровых приставок в Волжском. Бесплатная диагностика. Ремонт за 30 минут. Гарантия 12 месяцев. Адрес: пр-т Дружбы, 99Д">
+    <meta name="keywords" content="ремонт телефонов Волжский, ремонт приставок Волжский, замена экрана, замена аккумулятора, Технопро">
+    <meta name="author" content="Технопро">
     <meta name="robots" content="index, follow">
     
-    <link rel="canonical" href="https://tecnopro.ru">
-    
-    <!-- Open Graph -->
-    <meta property="og:title" content="TecnoPro — Нано-ремонт телефонов и приставок в Волжском">
-    <meta property="og:description" content="Ремонт за 60 минут. Гарантия 12 месяцев. Диагностика бесплатно. пр-т Дружбы, 99Д">
-    <meta property="og:url" content="https://tecnopro.ru">
+    <link rel="canonical" href="https://tehnopro.ru">
+    <meta property="og:title" content="Технопро — Нано-ремонт в Волжском">
+    <meta property="og:description" content="Ремонт за 30 минут. Бесплатная диагностика. пр-т Дружбы, 99Д">
     <meta property="og:type" content="website">
     
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
-    <!-- Яндекс.Карты API -->
     <script src="https://api-maps.yandex.ru/2.1/?apikey=ваш_ключ&lang=ru_RU"></script>
 </head>
 <body>
 
     <!-- Schema.org -->
     <div itemscope itemtype="https://schema.org/LocalBusiness" style="display: none;">
-        <meta itemprop="name" content="TecnoPro">
-        <meta itemprop="description" content="Ремонт телефонов и игровых приставок в Волжском">
+        <meta itemprop="name" content="Технопро">
         <meta itemprop="address" content="Волгоградская обл., Волжский, пр-т Дружбы, 99Д">
-        <meta itemprop="telephone" content="+79991234567">
-        <meta itemprop="email" content="info@tecnopro.ru">
-        <meta itemprop="priceRange" content="от 800 до 5000 ₽">
+        <meta itemprop="telephone" content="89377470615">
         <div itemprop="openingHours" content="Mo-Su 10:00-21:00"></div>
     </div>
 
-    <!-- 3D ТЕЛЕФОН -->
-    <div class="phone-3d-container">
-        <div class="phone-3d">
-            <div class="phone-body"></div>
-            <div class="phone-screen">
-                <div class="phone-screen-text">TECNO<span>PRO</span></div>
-            </div>
+    <!-- 4D СМАРТФОН НА ЗАДНЕМ ФОНЕ -->
+    <div class="phone-4d-container">
+        <div class="phone-4d">
+            <div class="phone-4d-body"></div>
+            <div class="phone-4d-screen"></div>
         </div>
     </div>
 
@@ -52,78 +43,116 @@
     
     <header class="glass-header">
         <div class="container header-flex">
-            <div class="logo" id="adminLogoTrigger">TECNO<span>PRO</span></div>
+            <div class="logo" id="adminLogoTrigger">ТЕХНО<span>ПРО</span></div>
             <nav>
-                <a href="#about">О нас</a>
-                <a href="#services">Услуги и цены</a>
+                <a href="#services">Услуги</a>
                 <a href="#tech">Технологии</a>
                 <a href="#reviews">Отзывы</a>
                 <a href="#" class="business-link" id="businessNavLink">Для бизнеса</a>
             </nav>
-            <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+            <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
         </div>
     </header>
 
-    <!-- ГЕРОЙ -->
-    <section class="hero">
-        <div class="container">
-            <div class="hero-grid">
-                <div class="hero-content">
-                    <div class="chip">Нано-сервис в Волжском</div>
-                    <h1>Ремонт телефонов и приставок <span class="highlight">с точностью до нанометра</span></h1>
-                    <p>Диагностика — 0 ₽. Ремонт за 60 минут. Гарантия 12 месяцев.</p>
-                    <button class="btn btn-primary" id="repairMainBtn">Записаться →</button>
-                </div>
-                <div class="hero-stats">
-                    <div class="stat-card-glass"><div class="stat-number">500+</div><div class="stat-label">ремонтов</div></div>
-                    <div class="stat-card-glass"><div class="stat-number">98%</div><div class="stat-label">довольных</div></div>
-                    <div class="stat-card-glass"><div class="stat-number">60'</div><div class="stat-label">среднее время</div></div>
-                </div>
-            </div>
+    <!-- БЕГУЩАЯ СТРОКА С ОТЗЫВАМИ -->
+    <div class="reviews-marquee">
+        <div class="marquee-content" id="marqueeContent">
+            <div class="marquee-item"><i class="fas fa-star"></i> Загрузка отзывов...</div>
         </div>
-    </section>
+    </div>
 
-    <!-- О КОМПАНИИ + КАРТА -->
-    <section id="about">
+    <!-- ОБЪЕДИНЁННЫЙ ГЛАВНЫЙ БЛОК (СО СЛАЙД-ШОУ) -->
+    <section class="hero-main">
         <div class="container">
-            <div class="about-wrapper">
-                <div class="about-image">
-                    <img src="/images/office.jpg" alt="Сервисный центр TecnoPro в Волжском" onerror="this.src='https://placehold.co/600x400/1e4b8f/white?text=TecnoPro'">
-                </div>
-                <div class="about-content">
-                    <div class="chip">О компании</div>
-                    <h2>TecnoPro — <span class="highlight">нано-ремонт</span> с 2026 года</h2>
-                    <p class="about-lead">Работаем на рынке с <strong>15 февраля 2026 года</strong>. За это время выполнили <strong>сотни успешных заказов</strong> и заработали репутацию надёжного сервиса.</p>
+            <div class="hero-main-grid">
+                <!-- ЛЕВАЯ КОЛОНКА - ИНФОРМАЦИЯ -->
+                <div class="hero-info">
+                    <div class="chip"><i class="fas fa-microchip"></i> Технопро — нано-сервис в Волжском</div>
+                    <h1>Ремонт телефонов и приставок <span class="highlight">с точностью до нанометра</span></h1>
                     
-                    <div class="about-features">
-                        <div class="about-feature"><div class="feature-icon">▣</div><div class="feature-text"><strong>500+</strong> отремонтированных устройств</div></div>
-                        <div class="about-feature"><div class="feature-icon">▣</div><div class="feature-text"><strong>60 минут</strong> — среднее время ремонта</div></div>
-                        <div class="about-feature"><div class="feature-icon">▣</div><div class="feature-text"><strong>12 месяцев</strong> гарантии на все работы</div></div>
-                        <div class="about-feature"><div class="feature-icon">▣</div><div class="feature-text"><strong>98%</strong> довольных клиентов</div></div>
+                    <div class="hero-stats-row">
+                        <div class="hero-stat">
+                            <i class="fas fa-smartphone"></i>
+                            <div><strong>500+</strong><span>ремонтов</span></div>
+                        </div>
+                        <div class="hero-stat highlight-star">
+                            <i class="fas fa-star"></i>
+                            <div><strong>№1*</strong><span>в Волжском</span></div>
+                        </div>
+                        <div class="hero-stat">
+                            <i class="fas fa-clock"></i>
+                            <div><strong>30'</strong><span>среднее время</span></div>
+                        </div>
                     </div>
-
-                    <div class="about-info">
-                        <div class="info-row"><span class="info-label">Адрес:</span><span>Волгоградская обл., Волжский, пр-т Дружбы, 99Д</span></div>
-                        <div class="info-row"><span class="info-label">График работы:</span><span>Пн–Вс: 10:00 – 21:00, без выходных</span></div>
-                        <div class="info-row"><span class="info-label">Телефон:</span><span><a href="tel:+79991234567">+7 (999) 123-45-67</a></span></div>
-                        <div class="info-row"><span class="info-label">Email:</span><span><a href="mailto:info@tecnopro.ru">info@tecnopro.ru</a></span></div>
+                    
+                    <div class="hero-features">
+                        <div class="hero-feature-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>Работаем с <strong>1 декабря 2023</strong></span>
+                        </div>
+                        <div class="hero-feature-item">
+                            <i class="fab fa-avianex"></i>
+                            <span><strong>12 лет</strong> на Авито</span>
+                        </div>
+                        <div class="hero-feature-item">
+                            <i class="fas fa-stethoscope"></i>
+                            <span>Диагностика <strong>бесплатно</strong></span>
+                        </div>
+                        <div class="hero-feature-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Гарантия <strong>12 месяцев</strong></span>
+                        </div>
                     </div>
-
-                    <div class="about-buttons">
-                        <button class="btn btn-primary" id="aboutRepairBtn">Записаться на ремонт</button>
-                        <button class="btn btn-outline" id="aboutBusinessBtn">Стать партнёром</button>
+                    
+                    <div class="hero-buttons">
+                        <button class="btn btn-primary" id="repairMainBtn"><i class="fas fa-calendar-check"></i> Записаться</button>
+                        <button class="btn btn-outline" id="priceBtn"><i class="fas fa-ruble-sign"></i> Цены</button>
                     </div>
                 </div>
-            </div>
-            
-            <!-- БЛОК КАРТЫ -->
-            <div class="map-container">
-                <div class="chip map-chip">Мы на карте</div>
-                <h3 class="map-title">Как нас <span class="highlight">найти</span></h3>
-                <div id="yandexMap" style="width: 100%; height: 400px; border-radius: 28px; overflow: hidden;"></div>
-                <div class="map-address">
-                    <span>📍 пр-т Дружбы, 99Д, Волжский, Волгоградская обл.</span>
-                    <a href="https://yandex.ru/maps/?whatshere%5Bzoom%5D=17&whatshere%5Bpoint%5D=44.779106,48.789673" target="_blank" class="map-link">Открыть в Яндекс.Картах →</a>
+                
+                <!-- ПРАВАЯ КОЛОНКА - СЛАЙД-ШОУ + ФАКТЫ -->
+                <div class="hero-media">
+                    <div class="slideshow-container">
+                        <div class="slides-wrapper">
+                            <div class="slide fade active" id="slide1">
+                                <img src="/images/office.jpg" alt="Сервисный центр" onerror="this.src='https://placehold.co/500x380/1e4b8f/white?text=Office'">
+                            </div>
+                            <div class="slide fade" id="slide2">
+                                <img src="/images/team.jpg" alt="Команда" onerror="this.src='https://placehold.co/500x380/1e4b8f/white?text=Team'">
+                            </div>
+                            <div class="slide fade" id="slide3">
+                                <img src="/images/repair1.jpg" alt="Ремонт" onerror="this.src='https://placehold.co/500x380/1e4b8f/white?text=Repair'">
+                            </div>
+                            <div class="slide fade" id="slide4">
+                                <img src="/images/repair2.jpg" alt="Процесс" onerror="this.src='https://placehold.co/500x380/1e4b8f/white?text=Process'">
+                            </div>
+                        </div>
+                        <button class="slide-prev" id="slidePrev"><i class="fas fa-chevron-left"></i></button>
+                        <button class="slide-next" id="slideNext"><i class="fas fa-chevron-right"></i></button>
+                        <div class="slide-dots">
+                            <span class="dot active" data-slide="0"></span>
+                            <span class="dot" data-slide="1"></span>
+                            <span class="dot" data-slide="2"></span>
+                            <span class="dot" data-slide="3"></span>
+                        </div>
+                    </div>
+                    <div class="hero-facts">
+                        <div class="fact-block">
+                            <i class="fas fa-smile"></i>
+                            <div class="fact-number">98%</div>
+                            <div class="fact-text">довольных клиентов</div>
+                        </div>
+                        <div class="fact-block">
+                            <i class="fas fa-clock"></i>
+                            <div class="fact-number">30'</div>
+                            <div class="fact-text">среднее время</div>
+                        </div>
+                        <div class="fact-block">
+                            <i class="fas fa-shield-alt"></i>
+                            <div class="fact-number">12</div>
+                            <div class="fact-text">месяцев гарантии</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -133,35 +162,33 @@
     <section id="services">
         <div class="container">
             <div class="section-header">
-                <div class="chip">Прайс-лист</div>
-                <h2>Услуги и <span class="highlight">время выполнения</span></h2>
-                <p class="section-subtitle">Ремонт под ключ с гарантией качества</p>
+                <h2>Услуги и <span class="highlight">цены</span></h2>
+                <p>Ремонт под ключ с гарантией</p>
             </div>
 
             <div class="tabs-switch">
-                <button class="tab-switch-btn active" data-tab="phones">Телефоны</button>
-                <button class="tab-switch-btn" data-tab="consoles">Игровые приставки</button>
+                <button class="tab-switch-btn active" data-tab="phones"><i class="fas fa-mobile-alt"></i> Телефоны</button>
+                <button class="tab-switch-btn" data-tab="consoles"><i class="fas fa-gamepad"></i> Приставки</button>
             </div>
 
             <div class="services-cards-container active" id="phones-services">
-                <div class="service-card"><div class="service-name">Замена экрана</div><div class="service-price">от 1 500 ₽</div><div class="service-time">40-60 мин</div><button class="service-btn" data-service="Замена экрана">Записаться</button></div>
-                <div class="service-card"><div class="service-name">Замена аккумулятора</div><div class="service-price">от 1 200 ₽</div><div class="service-time">30-50 мин</div><button class="service-btn" data-service="Замена аккумулятора">Записаться</button></div>
-                <div class="service-card"><div class="service-name">Замена разъёма зарядки</div><div class="service-price">от 900 ₽</div><div class="service-time">30-45 мин</div><button class="service-btn" data-service="Замена разъёма зарядки">Записаться</button></div>
-                <div class="service-card"><div class="service-name">Ремонт после воды</div><div class="service-price">от 2 000 ₽</div><div class="service-time">1-2 часа</div><button class="service-btn" data-service="Ремонт после воды">Записаться</button></div>
-                <div class="service-card"><div class="service-name">Прошивка / восстановление</div><div class="service-price">от 800 ₽</div><div class="service-time">40-90 мин</div><button class="service-btn" data-service="Прошивка">Записаться</button></div>
-                <div class="service-card"><div class="service-name">Ремонт динамика / микрофона</div><div class="service-price">от 1 000 ₽</div><div class="service-time">30-60 мин</div><button class="service-btn" data-service="Ремонт динамика">Записаться</button></div>
-                <div class="service-card"><div class="service-name">Замена камеры</div><div class="service-price">от 1 500 ₽</div><div class="service-time">40-60 мин</div><button class="service-btn" data-service="Замена камеры">Записаться</button></div>
-                <div class="service-card"><div class="service-name">Замена кнопок</div><div class="service-price">от 800 ₽</div><div class="service-time">20-40 мин</div><button class="service-btn" data-service="Замена кнопок">Записаться</button></div>
+                <div class="service-card popular"><div class="service-badge">Хит</div><i class="fas fa-mobile-alt service-icon"></i><div class="service-name">Замена экрана</div><div class="service-price">от 1 500 ₽</div><div class="service-time"><i class="far fa-clock"></i> 30-50 мин</div><button class="service-btn" data-service="Замена экрана">Выбрать</button></div>
+                <div class="service-card"><i class="fas fa-battery-full service-icon"></i><div class="service-name">Замена аккумулятора</div><div class="service-price">от 1 200 ₽</div><div class="service-time"><i class="far fa-clock"></i> 20-40 мин</div><button class="service-btn" data-service="Замена аккумулятора">Выбрать</button></div>
+                <div class="service-card"><i class="fas fa-plug service-icon"></i><div class="service-name">Замена разъёма</div><div class="service-price">от 900 ₽</div><div class="service-time"><i class="far fa-clock"></i> 20-35 мин</div><button class="service-btn" data-service="Замена разъёма зарядки">Выбрать</button></div>
+                <div class="service-card"><i class="fas fa-tint service-icon"></i><div class="service-name">Ремонт после воды</div><div class="service-price">от 2 000 ₽</div><div class="service-time"><i class="far fa-clock"></i> 1-2 часа</div><button class="service-btn" data-service="Ремонт после воды">Выбрать</button></div>
+                <div class="service-card"><i class="fas fa-code service-icon"></i><div class="service-name">Прошивка</div><div class="service-price">от 800 ₽</div><div class="service-time"><i class="far fa-clock"></i> 30-60 мин</div><button class="service-btn" data-service="Прошивка">Выбрать</button></div>
+                <div class="service-card"><i class="fas fa-microphone service-icon"></i><div class="service-name">Ремонт динамика</div><div class="service-price">от 1 000 ₽</div><div class="service-time"><i class="far fa-clock"></i> 20-40 мин</div><button class="service-btn" data-service="Ремонт динамика">Выбрать</button></div>
+                <div class="service-card sale"><div class="service-badge">-20%</div><i class="fas fa-camera service-icon"></i><div class="service-name">Замена камеры</div><div class="service-price"><span class="old-price">1 800 ₽</span> от 1 500 ₽</div><div class="service-time"><i class="far fa-clock"></i> 30-50 мин</div><button class="service-btn" data-service="Замена камеры">Выбрать</button></div>
+                <div class="service-card"><i class="fas fa-power-off service-icon"></i><div class="service-name">Замена кнопок</div><div class="service-price">от 800 ₽</div><div class="service-time"><i class="far fa-clock"></i> 15-30 мин</div><button class="service-btn" data-service="Замена кнопок">Выбрать</button></div>
             </div>
 
             <div class="services-cards-container" id="consoles-services">
-                <div class="service-card"><div class="service-name">Диагностика консоли</div><div class="service-price">от 1 000 ₽</div><div class="service-time">20-40 мин</div><button class="service-btn" data-service="Диагностика консоли">Записаться</button></div>
-                <div class="service-card"><div class="service-name">Перепрошивка / восстановление ПО</div><div class="service-price">от 2 000 ₽</div><div class="service-time">1-2 часа</div><button class="service-btn" data-service="Перепрошивка консоли">Записаться</button></div>
-                <div class="service-card"><div class="service-name">Ремонт дисковода</div><div class="service-price">от 2 500 ₽</div><div class="service-time">1-2 часа</div><button class="service-btn" data-service="Ремонт дисковода">Записаться</button></div>
-                <div class="service-card"><div class="service-name">Замена термопасты / чистка</div><div class="service-price">от 1 500 ₽</div><div class="service-time">40-60 мин</div><button class="service-btn" data-service="Замена термопасты">Записаться</button></div>
-                <div class="service-card"><div class="service-name">Ремонт блока питания</div><div class="service-price">от 2 000 ₽</div><div class="service-time">1-2 часа</div><button class="service-btn" data-service="Ремонт блока питания">Записаться</button></div>
-                <div class="service-card"><div class="service-name">Ремонт геймпада</div><div class="service-price">от 800 ₽</div><div class="service-time">30-50 мин</div><button class="service-btn" data-service="Ремонт геймпада">Записаться</button></div>
-                <div class="service-card"><div class="service-name">Ремонт HDMI-порта / чипа</div><div class="service-price">от 2 500 ₽</div><div class="service-time">1-2 часа</div><button class="service-btn" data-service="Ремонт HDMI">Записаться</button></div>
+                <div class="service-card popular"><div class="service-badge">Бесплатно!</div><i class="fas fa-microchip service-icon"></i><div class="service-name">Диагностика консоли</div><div class="service-price">0 ₽</div><div class="service-time"><i class="far fa-clock"></i> 20-40 мин</div><button class="service-btn" data-service="Диагностика консоли">Выбрать</button></div>
+                <div class="service-card"><i class="fas fa-sync-alt service-icon"></i><div class="service-name">Перепрошивка</div><div class="service-price">от 2 000 ₽</div><div class="service-time"><i class="far fa-clock"></i> 1-2 часа</div><button class="service-btn" data-service="Перепрошивка консоли">Выбрать</button></div>
+                <div class="service-card"><i class="fas fa-compact-disc service-icon"></i><div class="service-name">Ремонт дисковода</div><div class="service-price">от 2 500 ₽</div><div class="service-time"><i class="far fa-clock"></i> 1-2 часа</div><button class="service-btn" data-service="Ремонт дисковода">Выбрать</button></div>
+                <div class="service-card"><i class="fas fa-thermometer-half service-icon"></i><div class="service-name">Замена термопасты</div><div class="service-price">от 1 500 ₽</div><div class="service-time"><i class="far fa-clock"></i> 30-50 мин</div><button class="service-btn" data-service="Замена термопасты">Выбрать</button></div>
+                <div class="service-card"><i class="fas fa-gamepad service-icon"></i><div class="service-name">Ремонт геймпада</div><div class="service-price">от 800 ₽</div><div class="service-time"><i class="far fa-clock"></i> 20-40 мин</div><button class="service-btn" data-service="Ремонт геймпада">Выбрать</button></div>
+                <div class="service-card"><i class="fas fa-tv service-icon"></i><div class="service-name">Ремонт HDMI</div><div class="service-price">от 2 500 ₽</div><div class="service-time"><i class="far fa-clock"></i> 1-2 часа</div><button class="service-btn" data-service="Ремонт HDMI">Выбрать</button></div>
             </div>
         </div>
     </section>
@@ -170,13 +197,32 @@
     <section id="tech">
         <div class="container">
             <div class="section-header">
-                <div class="chip">Лаборатория</div>
-                <h2>Технологии <span class="highlight">нано-ремонта</span></h2>
+                <h2><span class="highlight">Нано-технологии</span></h2>
+                <p>Что мы умеем</p>
             </div>
-            <div class="accordion">
-                <div class="accordion-item"><div class="accordion-header">Микропайка BGA</div><div class="accordion-content">Замена процессоров, контроллеров питания, flash-памяти.</div></div>
-                <div class="accordion-item"><div class="accordion-header">Восстановление дорожек</div><div class="accordion-content">Восстанавливаем плату по нанометровой сетке. Гарантия 6 месяцев.</div></div>
-                <div class="accordion-item"><div class="accordion-header">Онлайн-статус ремонта</div><div class="accordion-content">Трек-код для отслеживания в Telegram или на сайте.</div></div>
+            <div class="tech-grid">
+                <div class="tech-card"><i class="fas fa-microchip"></i><h3>Микропайка BGA</h3><p>Замена процессоров, контроллеров питания, flash-памяти</p></div>
+                <div class="tech-card"><i class="fas fa-road"></i><h3>Восстановление дорожек</h3><p>Ремонт платы по нанометровой сетке, гарантия 6 месяцев</p></div>
+                <div class="tech-card"><i class="fas fa-chart-line"></i><h3>Онлайн-статус ремонта</h3><p>Трек-код для отслеживания в Telegram или на сайте</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- КАРТА -->
+    <section id="map-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Как <span class="highlight">нас найти</span></h2>
+                <p>Волгоградская обл., Волжский, пр-т Дружбы, 99Д</p>
+            </div>
+            <div class="map-wrapper">
+                <div id="yandexMap" style="width: 100%; height: 380px; border-radius: 24px;"></div>
+                <div class="map-info">
+                    <div><i class="fas fa-clock"></i> Пн–Вс: 10:00 – 21:00</div>
+                    <div><i class="fas fa-phone-alt"></i> <a href="tel:+79377470615">8 (937) 747-06-15</a></div>
+                    <div><i class="fas fa-envelope"></i> <a href="mailto:tehnopro134@mail.ru">tehnopro134@mail.ru</a></div>
+                    <a href="https://yandex.ru/maps/?whatshere%5Bzoom%5D=17&whatshere%5Bpoint%5D=44.805864,48.760910" target="_blank" class="map-link"><i class="fas fa-external-link-alt"></i> Открыть в Яндекс.Картах</a>
+                </div>
             </div>
         </div>
     </section>
@@ -185,22 +231,35 @@
     <section id="reviews">
         <div class="container">
             <div class="section-header">
-                <div class="chip">4.98 ★</div>
                 <h2>Что говорят <span class="highlight">клиенты</span></h2>
+                <p>4.98 ★ на Яндекс.Картах</p>
             </div>
-            <div class="reviews-scroll">
-                <div class="review-card"><div class="review-text">Починили iPhone 12 после воды за 2 часа. Гарантия 12 месяцев.</div><div class="review-author">Анна К.</div></div>
-                <div class="review-card"><div class="review-text">Заменили экран за 1500 ₽. Быстро, качественно, с чеком.</div><div class="review-author">Дмитрий П.</div></div>
-                <div class="review-card"><div class="review-text">Ремонтировал разъём зарядки — 900 ₽ и 40 минут.</div><div class="review-author">Игорь С.</div></div>
-                <div class="review-card"><div class="review-text">Цена до ремонта, без сюрпризов. Рекомендую.</div><div class="review-author">Марина В.</div></div>
+            <div class="reviews-grid" id="reviewsGrid">
+                <div class="review-card"><div class="review-text">Починили iPhone 12 после попадания воды за 2 часа. Гарантия 12 месяцев. Спасибо!</div><div class="review-author"><i class="fas fa-star"></i> Анна К.</div><div class="review-date">12.05.2025</div></div>
+                <div class="review-card"><div class="review-text">Заменили экран за 1500 ₽. Быстро, качественно. Оплатил переводом на карту.</div><div class="review-author"><i class="fas fa-star"></i> Дмитрий П.</div><div class="review-date">05.05.2025</div></div>
+                <div class="review-card"><div class="review-text">Ремонтировал разъём зарядки — 900 ₽ и 40 минут. Принимают наличные и переводы.</div><div class="review-author"><i class="fas fa-star"></i> Игорь С.</div><div class="review-date">28.04.2025</div></div>
+                <div class="review-card"><div class="review-text">Диагностику сделали бесплатно, даже когда я отказался от ремонта. Честные ребята.</div><div class="review-author"><i class="fas fa-star"></i> Марина В.</div><div class="review-date">20.04.2025</div></div>
+            </div>
+
+            <div class="add-review">
+                <h3><i class="fas fa-pen"></i> Оставить отзыв</h3>
+                <form id="reviewForm">
+                    <div class="review-form-row">
+                        <input type="text" id="reviewName" placeholder="Ваше имя" required>
+                        <input type="number" id="reviewRating" placeholder="Оценка (1-5)" min="1" max="5" step="1" required>
+                    </div>
+                    <textarea id="reviewText" rows="3" placeholder="Ваш отзыв..." required></textarea>
+                    <button type="submit" class="btn btn-primary">Отправить отзыв</button>
+                    <div id="reviewStatus" class="form-status"></div>
+                </form>
             </div>
         </div>
     </section>
 
-    <!-- МОДАЛЬНОЕ ОКНО -->
+    <!-- МОДАЛКА -->
     <div class="modal" id="serviceModal">
         <div class="modal-content">
-            <div class="modal-header"><h3>Запись на ремонт</h3><button class="modal-close" id="closeModalBtn">✕</button></div>
+            <div class="modal-header"><h3><i class="fas fa-tools"></i> Запись на ремонт</h3><button class="modal-close" id="closeModalBtn">&times;</button></div>
             <form id="quickForm">
                 <input type="text" id="modalName" placeholder="Ваше имя" required>
                 <input type="tel" id="modalPhone" placeholder="Телефон" required>
@@ -209,27 +268,17 @@
                     <select id="modalService" class="custom-select" required>
                         <option value="" disabled selected>Выберите услугу</option>
                         <optgroup label="Телефоны">
-                            <option value="Замена экрана">Замена экрана</option>
-                            <option value="Замена аккумулятора">Замена аккумулятора</option>
-                            <option value="Замена разъёма зарядки">Замена разъёма зарядки</option>
-                            <option value="Ремонт после воды">Ремонт после воды</option>
-                            <option value="Прошивка">Прошивка</option>
-                            <option value="Ремонт динамика">Ремонт динамика</option>
-                            <option value="Замена камеры">Замена камеры</option>
-                            <option value="Замена кнопок">Замена кнопок</option>
+                            <option>Замена экрана</option><option>Замена аккумулятора</option><option>Замена разъёма зарядки</option>
+                            <option>Ремонт после воды</option><option>Прошивка</option><option>Ремонт динамика</option>
+                            <option>Замена камеры</option><option>Замена кнопок</option>
                         </optgroup>
                         <optgroup label="Игровые приставки">
-                            <option value="Диагностика консоли">Диагностика консоли</option>
-                            <option value="Перепрошивка консоли">Перепрошивка консоли</option>
-                            <option value="Ремонт дисковода">Ремонт дисковода</option>
-                            <option value="Замена термопасты">Замена термопасты</option>
-                            <option value="Ремонт блока питания">Ремонт блока питания</option>
-                            <option value="Ремонт геймпада">Ремонт геймпада</option>
-                            <option value="Ремонт HDMI">Ремонт HDMI</option>
+                            <option>Диагностика консоли</option><option>Перепрошивка консоли</option><option>Ремонт дисковода</option>
+                            <option>Замена термопасты</option><option>Ремонт геймпада</option><option>Ремонт HDMI</option>
                         </optgroup>
                     </select>
                 </div>
-                <button type="submit" class="btn btn-primary btn-block">Отправить →</button>
+                <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-paper-plane"></i> Отправить</button>
                 <div id="modalStatus" class="form-status"></div>
             </form>
         </div>
@@ -237,47 +286,182 @@
 
     <!-- ПАНЕЛЬ БИЗНЕСА -->
     <div class="business-panel" id="businessPanel">
-        <div class="business-panel-header"><div class="chip">Для бизнеса</div><button class="close-panel" id="closePanelBtn">✕</button></div>
-        <div class="business-panel-content">
-            <h3>Реклама на мобильных устройствах</h3>
-            <p>Предустановка приложений, push-уведомления, виджеты на экран блокировки.</p>
-            <div class="business-grid">
-                <div class="business-offer">Предустановка — от 15 ₽</div>
-                <div class="business-offer">Push-кампании — от 5 000 ₽</div>
-                <div class="business-offer">Аналитика — бесплатно</div>
+        <div class="business-panel-header">
+            <div class="business-header-title">
+                <i class="fas fa-chart-line"></i>
+                <h3>Реклама на мобильных устройствах</h3>
             </div>
-            <form id="businessForm">
-                <input type="text" id="businessName" placeholder="Название компании" required>
-                <input type="tel" id="businessPhone" placeholder="Телефон" required>
-                <input type="email" id="businessEmail" placeholder="Email">
-                <button type="submit" class="btn btn-outline btn-block">Отправить заявку</button>
-                <div id="businessStatus" class="form-status"></div>
-            </form>
+            <button class="close-panel" id="closePanelBtn"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="business-panel-content">
+            <p class="business-lead">Охват реальной аудитории через сервисный центр «Технопро» — тысячи устройств ежемесячно</p>
+            
+            <div class="business-services">
+                <div class="business-service-card">
+                    <i class="fas fa-download"></i>
+                    <h4>Предустановка приложений</h4>
+                    <div class="price">от 15 ₽ / установка</div>
+                    <p>Ваше приложение на экране пользователя после ремонта</p>
+                    <div class="example">Пример: 1000 установок = 15 000 ₽</div>
+                </div>
+                <div class="business-service-card">
+                    <i class="fas fa-bell"></i>
+                    <h4>Push-уведомления</h4>
+                    <div class="price">от 5 000 ₽ / кампания</div>
+                    <p>Прямой контакт с аудиторией, высокий CTR</p>
+                    <div class="example">Пример: 10 000 уведомлений = 5 000 ₽</div>
+                </div>
+                <div class="business-service-card">
+                    <i class="fas fa-lock"></i>
+                    <h4>Виджеты на экран блокировки</h4>
+                    <div class="price">договорная</div>
+                    <p>100% внимание пользователя, максимальная эффективность</p>
+                    <div class="example">Индивидуальный расчёт под ваш бюджет</div>
+                </div>
+            </div>
+
+            <div class="business-features">
+                <div class="business-feature">
+                    <i class="fas fa-chart-simple"></i>
+                    <div>
+                        <strong>Точный таргетинг</strong>
+                        <p>По моделям телефонов, городу, полу, возрасту</p>
+                    </div>
+                </div>
+                <div class="business-feature">
+                    <i class="fas fa-chart-line"></i>
+                    <div>
+                        <strong>Детальная аналитика</strong>
+                        <p>Отчёты по CPM, CTR, охвату в реальном времени</p>
+                    </div>
+                </div>
+                <div class="business-feature">
+                    <i class="fas fa-headset"></i>
+                    <div>
+                        <strong>Личный менеджер</strong>
+                        <p>Помощь в настройке и оптимизации кампании</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="business-form-container">
+                <h4><i class="fas fa-paper-plane"></i> Оставить заявку</h4>
+                <p class="form-subtitle">Заполните форму — мы свяжемся с вами в течение 15 минут</p>
+                <form id="businessForm">
+                    <div class="business-form-row">
+                        <input type="text" id="businessName" placeholder="Название компании" required>
+                        <input type="tel" id="businessPhone" placeholder="Телефон" required>
+                    </div>
+                    <input type="email" id="businessEmail" placeholder="Email">
+                    <button type="submit" class="btn btn-primary btn-block">Отправить заявку <i class="fas fa-arrow-right"></i></button>
+                    <div id="businessStatus" class="form-status"></div>
+                </form>
+            </div>
         </div>
     </div>
 
+    <!-- ФУТЕР -->
     <footer>
-        <div class="container"><div class="footer-flex"><div>© 2026 TecnoPro — нано-ремонт телефонов и приставок в Волжском</div><div>Работаем с 15.02.2026 | <a href="#" id="openBusinessLink">Для бизнеса</a></div></div></div>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-logo">ТЕХНО<span>ПРО</span></div>
+                    <p>Нано-ремонт телефонов и приставок в Волжском с 2023 года</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Контакты</h4>
+                    <a href="tel:+79377470615"><i class="fas fa-phone"></i> 8 (937) 747-06-15</a>
+                    <a href="mailto:tehnopro134@mail.ru"><i class="fas fa-envelope"></i> tehnopro134@mail.ru</a>
+                    <a href="https://t.me/TEHNOPRO134" target="_blank" rel="noopener noreferrer"><i class="fab fa-telegram"></i> Telegram</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Быстрые ссылки</h4>
+                    <a href="#services">Услуги и цены</a>
+                    <a href="#tech">Технологии</a>
+                    <a href="#" id="footerBusinessLink">Для бизнеса</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Режим работы</h4>
+                    <p><i class="fas fa-clock"></i> Пн–Вс: 10:00 – 21:00</p>
+                    <p><i class="fas fa-map-marker-alt"></i> пр-т Дружбы, 99Д</p>
+                </div>
+            </div>
+            <div class="footer-note">
+                * По мнению клиентов сервисного центра «Технопро»
+            </div>
+            <div class="footer-bottom">© 2025 Технопро — Все права защищены</div>
+        </div>
     </footer>
 
     <script src="script.js"></script>
     <script>
-        // Инициализация Яндекс.Карты
         ymaps.ready(init);
         function init() {
             var myMap = new ymaps.Map("yandexMap", {
-                center: [48.789673, 44.779106],
+                center: [48.760910, 44.805864],
                 zoom: 17,
                 controls: ['zoomControl', 'fullscreenControl']
             });
-            var myPlacemark = new ymaps.Placemark([48.789673, 44.779106], {
-                balloonContent: 'TecnoPro<br>пр-т Дружбы, 99Д<br>Волжский, Волгоградская обл.'
-            }, {
-                preset: 'islands#blueIcon',
-                iconColor: '#00a8ff'
-            });
+            var myPlacemark = new ymaps.Placemark([48.760910, 44.805864], {
+                balloonContent: 'Технопро<br>Волжский, пр-т Дружбы, 99Д'
+            }, { preset: 'islands#blueIcon', iconColor: '#00a8ff' });
             myMap.geoObjects.add(myPlacemark);
         }
+        
+        // ===== ПЛАВНОЕ СЛАЙД-ШОУ (FADE) =====
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.dot');
+        let slideInterval;
+        
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === index);
+            });
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+            currentSlide = index;
+        }
+        
+        function nextSlide() {
+            const next = (currentSlide + 1) % slides.length;
+            showSlide(next);
+        }
+        
+        function prevSlide() {
+            const prev = (currentSlide - 1 + slides.length) % slides.length;
+            showSlide(prev);
+        }
+        
+        function startAutoSlide() {
+            if (slideInterval) clearInterval(slideInterval);
+            slideInterval = setInterval(nextSlide, 5000);
+        }
+        
+        function stopAutoSlide() {
+            if (slideInterval) clearInterval(slideInterval);
+        }
+        
+        document.getElementById('slideNext')?.addEventListener('click', () => {
+            nextSlide();
+            stopAutoSlide();
+            startAutoSlide();
+        });
+        document.getElementById('slidePrev')?.addEventListener('click', () => {
+            prevSlide();
+            stopAutoSlide();
+            startAutoSlide();
+        });
+        dots.forEach((dot, i) => {
+            dot.addEventListener('click', () => {
+                showSlide(i);
+                stopAutoSlide();
+                startAutoSlide();
+            });
+        });
+        
+        startAutoSlide();
     </script>
 </body>
 </html>
