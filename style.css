@@ -49,44 +49,91 @@ body {
     padding: 12px 0;
 }
 
-/* ЛОГОТИП (БЕЗ РАМКИ, С ЭФФЕКТОМ СТЕКЛА) */
+/* ЛОГОТИП С ТОНКИМ АККУРАТНЫМ ШРИФТОМ */
 .logo-group {
     cursor: pointer;
     display: flex;
     align-items: center;
+    gap: 12px;
     position: relative;
 }
 
 .logo-group img {
-    height: 50px;
+    height: 45px;
     width: auto;
-    transition: all 0.3s ease;
-    position: relative;
-    z-index: 1;
-    filter: drop-shadow(0 0 8px rgba(0, 168, 255, 0.3));
+    transition: transform 0.2s ease;
 }
 
 .logo-group img:hover {
     transform: scale(1.02);
-    filter: drop-shadow(0 0 15px rgba(0, 168, 255, 0.5));
 }
 
-/* Эффект свечения под логотипом (вместо рамки) */
-.logo-group::after {
-    content: '';
-    position: absolute;
-    bottom: -5px;
-    left: 5%;
-    width: 90%;
-    height: 3px;
-    background: linear-gradient(90deg, transparent, #00a8ff, #3b82f6, #00a8ff, transparent);
-    border-radius: 3px;
-    opacity: 0.6;
-    transition: opacity 0.3s ease;
+.logo-text-group {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
 }
 
-.logo-group:hover::after {
-    opacity: 1;
+.logo-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 2.5px;
+    background: linear-gradient(
+        135deg,
+        #e8e8e8 0%,
+        #b0b0b0 20%,
+        #ffffff 35%,
+        #00a8ff 50%,
+        #3b82f6 65%,
+        #ffffff 80%,
+        #c0c0c0 100%
+    );
+    background-size: 250% 250%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: diagonalMetalShine 2.5s ease infinite;
+}
+
+.logo-text span {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    background: linear-gradient(
+        135deg,
+        #00a8ff 0%,
+        #ffffff 30%,
+        #3b82f6 50%,
+        #ffffff 70%,
+        #00a8ff 100%
+    );
+    background-size: 250% 250%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: diagonalMetalShineSpan 2.5s ease infinite;
+}
+
+@keyframes diagonalMetalShine {
+    0% { background-position: 0% 0%; }
+    50% { background-position: 100% 100%; }
+    100% { background-position: 0% 0%; }
+}
+
+@keyframes diagonalMetalShineSpan {
+    0% { background-position: 0% 0%; }
+    50% { background-position: 100% 100%; }
+    100% { background-position: 0% 0%; }
+}
+
+.logo-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: 8px;
+    font-weight: 400;
+    letter-spacing: 1.2px;
+    color: #a0a0b0;
+    margin-top: 3px;
+    text-transform: uppercase;
 }
 
 nav a {
@@ -124,6 +171,7 @@ nav a:hover { color: #00a8ff; }
     padding: 6px 16px;
     font-size: 13px;
     margin-bottom: 24px;
+    color: #00a8ff;
 }
 h1 {
     font-size: 48px;
@@ -147,7 +195,7 @@ h1 {
     margin-bottom: 40px;
 }
 .btn-primary-modern {
-    background: linear-gradient(135deg, #00a8ff, #0080cc);
+    background: linear-gradient(135deg, #1e4b8f, #00a8ff);
     border: none;
     padding: 12px 28px;
     border-radius: 40px;
@@ -508,6 +556,7 @@ h1 {
     .services-grid { grid-template-columns: 1fr; }
     .reviews-grid { grid-template-columns: 1fr; }
     .review-form-row { grid-template-columns: 1fr; }
-    .logo-group img { height: 38px; }
-    .logo-group::after { bottom: -3px; height: 2px; }
+    .logo-group img { height: 35px; }
+    .logo-text { font-size: 13px; }
+    .logo-subtitle { font-size: 7px; letter-spacing: 0.8px; }
 }
