@@ -49,65 +49,44 @@ body {
     padding: 12px 0;
 }
 
-/* ЛОГОТИП С ПЕРЕЛИВАЮЩИМСЯ ЭФФЕКТОМ НА КАРТИНКУ */
+/* ЛОГОТИП (БЕЗ РАМКИ, С ЭФФЕКТОМ СТЕКЛА) */
 .logo-group {
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 12px;
     position: relative;
 }
 
 .logo-group img {
     height: 50px;
     width: auto;
-    transition: transform 0.2s ease;
+    transition: all 0.3s ease;
     position: relative;
     z-index: 1;
+    filter: drop-shadow(0 0 8px rgba(0, 168, 255, 0.3));
 }
 
 .logo-group img:hover {
     transform: scale(1.02);
+    filter: drop-shadow(0 0 15px rgba(0, 168, 255, 0.5));
 }
 
-/* Переливающийся эффект поверх картинки логотипа */
-.logo-group::before {
+/* Эффект свечения под логотипом (вместо рамки) */
+.logo-group::after {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 50px;
-    height: 50px;
-    background: linear-gradient(90deg, #00a8ff, #3b82f6, #00a8ff, #3b82f6);
-    background-size: 300% 100%;
-    border-radius: 12px;
-    opacity: 0.5;
-    z-index: 2;
-    pointer-events: none;
-    animation: logoShimmer 3s ease infinite;
-    mix-blend-mode: overlay;
+    bottom: -5px;
+    left: 5%;
+    width: 90%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #00a8ff, #3b82f6, #00a8ff, transparent);
+    border-radius: 3px;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
 }
 
-@keyframes logoShimmer {
-    0% { background-position: 0% 50%; opacity: 0.3; }
-    50% { background-position: 100% 50%; opacity: 0.7; }
-    100% { background-position: 0% 50%; opacity: 0.3; }
-}
-
-.logo-text {
-    font-size: 22px;
-    font-weight: 800;
-    letter-spacing: 1px;
-    background: linear-gradient(135deg, #ffffff, #00a8ff);
-    background-clip: text;
-    -webkit-background-clip: text;
-    color: transparent;
-}
-.logo-text span {
-    background: linear-gradient(135deg, #00a8ff, #3b82f6);
-    background-clip: text;
-    -webkit-background-clip: text;
-    color: transparent;
+.logo-group:hover::after {
+    opacity: 1;
 }
 
 nav a {
@@ -530,6 +509,5 @@ h1 {
     .reviews-grid { grid-template-columns: 1fr; }
     .review-form-row { grid-template-columns: 1fr; }
     .logo-group img { height: 38px; }
-    .logo-text { font-size: 18px; }
-    .logo-group::before { width: 38px; height: 38px; }
+    .logo-group::after { bottom: -3px; height: 2px; }
 }
