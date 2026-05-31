@@ -44,12 +44,17 @@ body {
 .login-card button {
     width: 100%;
     padding: 12px;
-    background: #00a8ff;
+    background: linear-gradient(135deg, #00a8ff, #1e4b8f);
     border: none;
     border-radius: 30px;
     color: white;
     cursor: pointer;
     font-weight: bold;
+    transition: 0.2s;
+}
+.login-card button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 168, 255, 0.3);
 }
 #loginError { color: #f97316; margin-top: 10px; }
 
@@ -124,6 +129,7 @@ body {
     border-radius: 30px;
     color: #f97316;
     cursor: pointer;
+    transition: 0.2s;
 }
 .logout-btn:hover { background: #f97316; color: white; }
 
@@ -206,22 +212,38 @@ body {
     border-radius: 30px;
     color: white;
     cursor: pointer;
+    transition: 0.2s;
+}
+.btn-secondary:hover {
+    background: #2a4a6f;
+    transform: translateY(-1px);
 }
 .btn-primary {
-    background: #00a8ff;
+    background: linear-gradient(135deg, #00a8ff, #1e4b8f);
     border: none;
     padding: 10px 20px;
     border-radius: 30px;
     color: white;
     cursor: pointer;
+    font-weight: 500;
+    transition: 0.2s;
+}
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 168, 255, 0.3);
 }
 .btn-danger {
-    background: rgba(249,115,22,0.2);
-    border: 1px solid #f97316;
+    background: linear-gradient(135deg, #f97316, #dc2626);
+    border: none;
     padding: 10px 20px;
     border-radius: 30px;
-    color: #f97316;
+    color: white;
     cursor: pointer;
+    transition: 0.2s;
+}
+.btn-danger:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
 }
 .page-header {
     display: flex;
@@ -254,30 +276,42 @@ body {
 .status-new { background: #fef3c7; color: #d97706; }
 .status-work { background: #dbeafe; color: #2563eb; }
 .status-done { background: #d1fae5; color: #059669; }
+
+/* ===== НОВЫЙ СТИЛЬ КНОПОК ДЕЙСТВИЙ ===== */
 .action-btn {
     background: none;
     border: none;
     cursor: pointer;
-    padding: 4px 10px;
-    border-radius: 20px;
-    margin: 0 2px;
+    padding: 6px 14px;
+    border-radius: 30px;
+    margin: 0 4px;
+    font-weight: 500;
+    font-size: 12px;
+    transition: all 0.2s ease;
 }
-.action-work { background: #dbeafe; color: #2563eb; }
-.action-done { background: #d1fae5; color: #059669; }
-.action-delete { background: #fee2e2; color: #dc2626; }
-.pagination {
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-    margin-top: 20px;
-}
-.pagination button {
-    background: #0f1a2f;
-    border: 1px solid #1e3a5f;
-    padding: 6px 12px;
-    border-radius: 20px;
-    cursor: pointer;
+.action-work {
+    background: linear-gradient(135deg, #2563eb, #1e4b8f);
     color: white;
+}
+.action-work:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4);
+}
+.action-done {
+    background: linear-gradient(135deg, #059669, #047857);
+    color: white;
+}
+.action-done:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(5, 150, 105, 0.4);
+}
+.action-delete {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    color: white;
+}
+.action-delete:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(220, 38, 38, 0.4);
 }
 
 /* КАРТОЧКИ */
@@ -298,13 +332,36 @@ body {
 .review-actions, .service-actions { margin-top: 12px; display: flex; gap: 8px; }
 .review-actions button, .service-actions button {
     padding: 6px 14px;
-    border-radius: 20px;
+    border-radius: 30px;
     border: none;
     cursor: pointer;
+    font-weight: 500;
+    transition: 0.2s;
 }
-.btn-approve { background: #10b981; color: white; }
-.btn-reject { background: #f97316; color: white; }
-.btn-delete { background: #dc2626; color: white; }
+.btn-approve {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+.btn-approve:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+}
+.btn-reject {
+    background: linear-gradient(135deg, #f97316, #ea580c);
+    color: white;
+}
+.btn-reject:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(249, 115, 22, 0.4);
+}
+.btn-delete {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    color: white;
+}
+.btn-delete:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
+}
 
 /* ФОТО */
 .photos-grid {
@@ -373,12 +430,34 @@ body {
 }
 .settings-card button { width: 100%; margin-top: 10px; }
 
+/* ПАГИНАЦИЯ */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 20px;
+}
+.pagination button {
+    background: linear-gradient(135deg, #1e3a5f, #0f1a2f);
+    border: 1px solid #00a8ff40;
+    padding: 6px 14px;
+    border-radius: 30px;
+    cursor: pointer;
+    color: white;
+    transition: 0.2s;
+}
+.pagination button:hover {
+    background: #00a8ff;
+    transform: translateY(-1px);
+}
+
 /* ТЁМНАЯ ТЕМА */
 body.dark-theme {
     background: #0a0a0f;
 }
 body.dark-theme .sidebar, body.dark-theme .top-bar, body.dark-theme .stat-card, body.dark-theme .chart-card,
-body.dark-theme .review-card, body.dark-theme .service-card, body.dark-theme .settings-card {
+body.dark-theme .review-card, body.dark-theme .service-card, body.dark-theme .settings-card,
+body.dark-theme .table-wrapper, body.dark-theme .data-table th, body.dark-theme .data-table td {
     background: #111118;
 }
 .text-center { text-align: center; }
@@ -388,4 +467,5 @@ body.dark-theme .review-card, body.dark-theme .service-card, body.dark-theme .se
     .sidebar.open { transform: translateX(0); }
     .main-content { margin-left: 0; }
     .stats { grid-template-columns: repeat(2, 1fr); }
+    .action-btn { padding: 4px 10px; font-size: 11px; }
 }
