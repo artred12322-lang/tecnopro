@@ -1,45 +1,10 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
-const crypto = require('crypto');
 const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-// ===== ХРАНИЛИЩЕ ДЛЯ CSRF-ТОКЕНОВ =====
-const csrfTokens = new Map();
-const CSRF_TOKEN_TTL = 60 * 60 * 1000; // 1 час
-
-// Очистка старых токенов
-setInterval(() => {
-    const now = Date.now();
-    for (const [token, expiresAt] of csrfTokens.entries()) {
-        if (expiresAt < now) csrfTokens.delete(token);
-    }
-}, 10 * 60 * 1000);
-
-// Генерация CSRF-токена
-function generateCsrfToken() {
-    const token = crypto.randomBytes(32).toString('hex');
-    csrfTokens.set(token, Date.now() + CSRF_TOKEN_TTL);
-    return token;
-}
-
-// Проверка CSRF-токена
-function verifyCsrfToken(token, res) {
-    if (!token) {
-        res.status(403).json({ error: 'CSRF токен отсутствует' });
-        return false;
-    }
-    if (!csrfTokens.has(token)) {
-        res.status(403).json({ error: 'Неверный или истёкший CSRF токен' });
-        return false;
-    }
-    // Токен одноразовый — удаляем после использования
-    csrfTokens.delete(token);
-    return true;
-}
 
 app.use(cors());
 app.use(express.json());
@@ -64,12 +29,6 @@ db.run(`
   )
 `);
 
-// ===== API: ПОЛУЧИТЬ CSRF-ТОКЕН =====
-app.get('/api/csrf-token', (req, res) => {
-    const token = generateCsrfToken();
-    res.json({ csrfToken: token });
-});
-
 // ===== API: ПОЛУЧИТЬ ВСЕ ЗАЯВКИ =====
 app.get('/api/requests', (req, res) => {
     db.all('SELECT * FROM requests ORDER BY created_at DESC', (err, rows) => {
@@ -86,22 +45,13 @@ app.get('/api/stats', (req, res) => {
     });
 });
 
-// ===== API: СОЗДАТЬ ЗАЯВКУ (С CSRF-ЗАЩИТОЙ) =====
+// ===== API: СОЗДАТЬ ЗАЯВКУ (БЕЗ CSRF) =====
 app.post('/api/request', (req, res) => {
-    const { type, name, phone, email, model, service, message, csrfToken } = req.body;
-    
-    // Проверка CSRF-токена
-    if (!verifyCsrfToken(csrfToken, res)) return;
+    const { type, name, phone, email, model, service, message } = req.body;
     
     // Валидация
     if (!name || !phone) {
         return res.status(400).json({ error: 'Имя и телефон обязательны' });
-    }
-    
-    // Валидация телефона
-    const phoneRegex = /^[\d\s\+\(\)\-]{10,20}$/;
-    if (!phoneRegex.test(phone)) {
-        return res.status(400).json({ error: 'Неверный формат телефона' });
     }
     
     db.run(
