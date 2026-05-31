@@ -206,31 +206,64 @@
         </div>
     </section>
 
-    <!-- МОДАЛКА -->
+    <!-- МОДАЛЬНОЕ ОКНО ЗАПИСИ НА РЕМОНТ (НОВАЯ ВЕРСИЯ) -->
     <div class="modal" id="serviceModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h3><i class="fas fa-tools"></i> Запись на ремонт</h3>
-                <button class="modal-close" id="closeModalBtn">&times;</button>
+                <button class="modal-close" id="closeModalBtn"><i class="fas fa-times"></i></button>
             </div>
             <form id="quickForm">
-                <input type="text" id="modalName" placeholder="Ваше имя" required>
-                <input type="tel" id="modalPhone" placeholder="Телефон" required>
-                <input type="text" id="modalModel" placeholder="Модель (iPhone 12, PS5...)" required>
-                <select id="modalService" required>
-                    <option value="" disabled selected>Выберите услугу</option>
-                    <optgroup label="Телефоны">
-                        <option>Замена экрана</option><option>Замена аккумулятора</option>
-                        <option>Замена разъёма зарядки</option><option>Ремонт после воды</option>
-                        <option>Прошивка</option><option>Ремонт динамика</option>
-                    </optgroup>
-                    <optgroup label="Игровые приставки">
-                        <option>Диагностика консоли</option><option>Перепрошивка консоли</option>
-                        <option>Ремонт дисковода</option><option>Замена термопасты</option>
-                        <option>Ремонт геймпада</option><option>Ремонт HDMI</option>
-                    </optgroup>
-                </select>
-                <button type="submit" class="btn-primary-modern btn-block">Отправить →</button>
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Ваше имя</label>
+                    <input type="text" id="modalName" placeholder="Иван Иванов" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-phone-alt"></i> Телефон</label>
+                    <input type="tel" id="modalPhone" placeholder="+7 (999) 123-45-67" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-mobile-alt"></i> Модель</label>
+                    <input type="text" id="modalModel" placeholder="iPhone 12, Samsung S21, PS5..." required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-list"></i> Услуга</label>
+                    <select id="modalService" required>
+                        <option value="" disabled selected>— Выберите услугу —</option>
+                        <optgroup label="Телефоны">
+                            <option value="Замена экрана">Замена экрана</option>
+                            <option value="Замена аккумулятора">Замена аккумулятора</option>
+                            <option value="Замена разъёма зарядки">Замена разъёма зарядки</option>
+                            <option value="Ремонт после воды">Ремонт после воды</option>
+                            <option value="Прошивка">Прошивка</option>
+                            <option value="Ремонт динамика">Ремонт динамика</option>
+                        </optgroup>
+                        <optgroup label="Игровые приставки">
+                            <option value="Диагностика консоли">Диагностика консоли</option>
+                            <option value="Перепрошивка консоли">Перепрошивка консоли</option>
+                            <option value="Ремонт дисковода">Ремонт дисковода</option>
+                            <option value="Замена термопасты">Замена термопасты</option>
+                            <option value="Ремонт геймпада">Ремонт геймпада</option>
+                            <option value="Ремонт HDMI">Ремонт HDMI</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-alt"></i> Удобное время</label>
+                    <select id="modalTime">
+                        <option value="" disabled selected>— Выберите время —</option>
+                        <option value="10:00-12:00">10:00 – 12:00</option>
+                        <option value="12:00-14:00">12:00 – 14:00</option>
+                        <option value="14:00-16:00">14:00 – 16:00</option>
+                        <option value="16:00-18:00">16:00 – 18:00</option>
+                        <option value="18:00-20:00">18:00 – 20:00</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-comment"></i> Комментарий</label>
+                    <textarea id="modalComment" rows="2" placeholder="Опишите проблему подробнее..."></textarea>
+                </div>
+                <button type="submit" class="btn-submit"><i class="fas fa-paper-plane"></i> Отправить заявку</button>
                 <div id="modalStatus" class="form-status"></div>
             </form>
         </div>
@@ -349,44 +382,91 @@
         // Модалка
         const modal = document.getElementById('serviceModal');
         const closeModal = document.getElementById('closeModalBtn');
+        const modalServiceSelect = document.getElementById('modalService');
+        
         document.querySelectorAll('.service-select').forEach(btn => {
             btn.addEventListener('click', () => {
                 const service = btn.dataset.service;
-                const select = document.getElementById('modalService');
-                for (let i = 0; i < select.options.length; i++) {
-                    if (select.options[i].value === service || select.options[i].text === service) {
-                        select.selectedIndex = i;
-                        break;
+                if (modalServiceSelect && service) {
+                    for (let i = 0; i < modalServiceSelect.options.length; i++) {
+                        if (modalServiceSelect.options[i].value === service || modalServiceSelect.options[i].text === service) {
+                            modalServiceSelect.selectedIndex = i;
+                            break;
+                        }
                     }
                 }
                 modal.classList.add('active');
             });
         });
-        document.getElementById('repairMainBtn')?.addEventListener('click', () => modal.classList.add('active'));
+        
+        document.getElementById('repairMainBtn')?.addEventListener('click', () => {
+            if (modalServiceSelect) modalServiceSelect.selectedIndex = 0;
+            modal.classList.add('active');
+        });
+        
         closeModal?.addEventListener('click', () => modal.classList.remove('active'));
         window.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
         
-        // Отправка формы
+        // Отправка формы записи
         document.getElementById('quickForm')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('modalName')?.value.trim();
             const phone = document.getElementById('modalPhone')?.value.trim();
             const model = document.getElementById('modalModel')?.value.trim();
             const service = document.getElementById('modalService')?.value;
-            if (!name || !phone) { document.getElementById('modalStatus').innerHTML = 'Заполните имя и телефон'; return; }
-            document.getElementById('modalStatus').innerHTML = 'Отправка...';
+            const time = document.getElementById('modalTime')?.value;
+            const comment = document.getElementById('modalComment')?.value.trim();
+            const statusDiv = document.getElementById('modalStatus');
+            
+            if (!name || !phone) {
+                if (statusDiv) {
+                    statusDiv.innerHTML = 'Заполните имя и телефон';
+                    statusDiv.style.color = '#f97316';
+                }
+                return;
+            }
+            if (!service) {
+                if (statusDiv) {
+                    statusDiv.innerHTML = 'Выберите услугу';
+                    statusDiv.style.color = '#f97316';
+                }
+                return;
+            }
+            
+            if (statusDiv) statusDiv.innerHTML = 'Отправка...';
+            
             try {
                 const res = await fetch('/api/request', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ type: 'repair', name, phone, model, service })
+                    body: JSON.stringify({ 
+                        type: 'repair', 
+                        name, 
+                        phone, 
+                        model: model || '', 
+                        service: service,
+                        time: time || '',
+                        comment: comment || ''
+                    })
                 });
                 const data = await res.json();
                 if (data.success) {
-                    document.getElementById('modalStatus').innerHTML = '✅ Заявка принята!';
-                    setTimeout(() => modal.classList.remove('active'), 1500);
+                    if (statusDiv) {
+                        statusDiv.innerHTML = '✅ Заявка принята! Мы перезвоним.';
+                        statusDiv.style.color = '#10b981';
+                    }
+                    document.getElementById('quickForm').reset();
+                    setTimeout(() => {
+                        modal.classList.remove('active');
+                        if (statusDiv) statusDiv.innerHTML = '';
+                    }, 2000);
                 } else throw new Error();
-            } catch { document.getElementById('modalStatus').innerHTML = '❌ Ошибка'; }
+            } catch (err) {
+                if (statusDiv) {
+                    statusDiv.innerHTML = '❌ Ошибка. Попробуйте позже.';
+                    statusDiv.style.color = '#f97316';
+                }
+            }
         });
         
         // Бизнес-панель
@@ -415,7 +495,7 @@
             } catch { document.getElementById('businessStatus').innerHTML = '❌ Ошибка'; }
         });
         
-        // ===== ОТЗЫВЫ С МОДЕРАЦИЕЙ =====
+        // ОТЗЫВЫ
         let allReviews = JSON.parse(localStorage.getItem('tehno_reviews') || '[]');
         let currentFilter = 'all';
         
@@ -536,14 +616,14 @@
             if (!name || !rating || rating === 0 || !text) {
                 if (statusDiv) {
                     statusDiv.innerHTML = 'Заполните все поля и выберите оценку';
-                    statusDiv.style.color = '#e67e22';
+                    statusDiv.style.color = '#f97316';
                 }
                 return;
             }
             if (rating < 1 || rating > 5) {
                 if (statusDiv) {
                     statusDiv.innerHTML = 'Оценка должна быть от 1 до 5';
-                    statusDiv.style.color = '#e67e22';
+                    statusDiv.style.color = '#f97316';
                 }
                 return;
             }
