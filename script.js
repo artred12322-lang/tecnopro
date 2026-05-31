@@ -1,4 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // ===== CSRF-ТОКЕН =====
+    let csrfToken = null;
+    
+    async function getCsrfToken() {
+        try {
+            const res = await fetch('/api/csrf-token');
+            const data = await res.json();
+            csrfToken = data.csrfToken;
+            return csrfToken;
+        } catch (err) {
+            console.error('Ошибка получения CSRF-токена:', err);
+            return null;
+        }
+    }
+    
+    getCsrfToken();
+    
     // ===== СЛАЙДЕР =====
     let currentSlide = 0;
     const slides = document.querySelectorAll('.slider-slide');
@@ -80,13 +97,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target === modal) modal.classList.remove('active');
     });
     
-    // ===== ОТПРАВКА ФОРМЫ ЗАПИСИ (РАБОТАЕТ НА RENDER) =====
+    // ===== ОТПРАВКА ФОРМЫ ЗАПИСИ =====
     const quickForm = document.getElementById('quickForm');
     const modalStatus = document.getElementById('modalStatus');
     
     if (quickForm) {
         quickForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            const submitBtn = quickForm.querySelector('button[type="submit"]');
+            if (submitBtn) submitBtn.disabled = true;
             
             const name = document.getElementById('modalName')?.value.trim();
             const phone = document.getElementById('modalPhone')?.value.trim();
@@ -100,6 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     modalStatus.innerHTML = 'Заполните имя и телефон';
                     modalStatus.style.color = '#f97316';
                 }
+                if (submitBtn) submitBtn.disabled = false;
                 return;
             }
             if (!service) {
@@ -107,6 +128,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     modalStatus.innerHTML = 'Выберите услугу';
                     modalStatus.style.color = '#f97316';
                 }
+                if (submitBtn) submitBtn.disabled = false;
+                return;
+            }
+            
+            const token = await getCsrfToken();
+            if (!token) {
+                if (modalStatus) {
+                    modalStatus.innerHTML = 'Ошибка безопасности. Обновите страницу.';
+                    modalStatus.style.color = '#f97316';
+                }
+                if (submitBtn) submitBtn.disabled = false;
                 return;
             }
             
@@ -118,9 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const response = await fetch('/api/request', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         type: 'repair',
                         name: name,
@@ -129,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         service: service,
                         time: time || '',
                         comment: comment || '',
-                        message: (time ? 'Время: ' + time + '\n' : '') + (comment || '')
+                        csrfToken: token
                     })
                 });
                 
@@ -150,11 +180,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     throw new Error(data.error || 'Ошибка сервера');
                 }
             } catch (err) {
-                console.error('Ошибка отправки:', err);
+                console.error('Ошибка:', err);
                 if (modalStatus) {
                     modalStatus.innerHTML = '❌ Ошибка. Попробуйте позже.';
                     modalStatus.style.color = '#f97316';
                 }
+            } finally {
+                if (submitBtn) submitBtn.disabled = false;
             }
         });
     }
@@ -196,6 +228,9 @@ document.addEventListener('DOMContentLoaded', () => {
         businessForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            const submitBtn = businessForm.querySelector('button[type="submit"]');
+            if (submitBtn) submitBtn.disabled = true;
+            
             const name = document.getElementById('businessName')?.value.trim();
             const phone = document.getElementById('businessPhone')?.value.trim();
             const email = document.getElementById('businessEmail')?.value.trim();
@@ -205,25 +240,33 @@ document.addEventListener('DOMContentLoaded', () => {
                     businessStatus.innerHTML = 'Заполните компанию и телефон';
                     businessStatus.style.color = '#f97316';
                 }
+                if (submitBtn) submitBtn.disabled = false;
                 return;
             }
             
-            if (businessStatus) {
-                businessStatus.innerHTML = 'Отправка...';
+            const token = await getCsrfToken();
+            if (!token) {
+                if (businessStatus) {
+                    businessStatus.innerHTML = 'Ошибка безопасности. Обновите страницу.';
+                    businessStatus.style.color = '#f97316';
+                }
+                if (submitBtn) submitBtn.disabled = false;
+                return;
             }
+            
+            if (businessStatus) businessStatus.innerHTML = 'Отправка...';
             
             try {
                 const response = await fetch('/api/request', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         type: 'business',
                         name: name,
                         phone: phone,
                         email: email || '',
-                        service: 'Рекламный контракт'
+                        service: 'Рекламный контракт',
+                        csrfToken: token
                     })
                 });
                 
@@ -240,11 +283,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     throw new Error(data.error || 'Ошибка сервера');
                 }
             } catch (err) {
-                console.error('Ошибка отправки:', err);
+                console.error('Ошибка:', err);
                 if (businessStatus) {
                     businessStatus.innerHTML = '❌ Ошибка. Попробуйте позже.';
                     businessStatus.style.color = '#f97316';
                 }
+            } finally {
+                if (submitBtn) submitBtn.disabled = false;
             }
         });
     }
@@ -416,7 +461,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     renderMarquee();
     
-    // ===== СКРЫТЫЙ ВХОД В АДМИНКУ (5 КЛИКОВ ПО ЛОГОТИПУ) =====
+    // ===== СКРЫТЫЙ ВХОД В АДМИНКУ =====
     let clickCount = 0;
     let clickTimer = null;
     const adminLogo = document.getElementById('adminLogoTrigger');
