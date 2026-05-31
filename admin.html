@@ -9,159 +9,145 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="login-container" id="loginContainer">
-        <div class="login-box">
-            <i class="fas fa-shield-alt login-icon"></i>
-            <h2>Вход в админ-панель</h2>
-            <input type="password" id="passwordInput" placeholder="Пароль" autofocus>
-            <button id="loginBtn" class="btn">Войти <i class="fas fa-arrow-right"></i></button>
-            <div id="loginError" class="error"></div>
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-card">
+            <div class="login-icon"><i class="fas fa-shield-alt"></i></div>
+            <h2>Технопро Админ</h2>
+            <input type="password" id="loginPassword" placeholder="Пароль">
+            <button id="loginSubmitBtn">Войти <i class="fas fa-arrow-right"></i></button>
+            <div id="loginErrorMsg"></div>
         </div>
     </div>
 
-    <div class="admin-container" id="adminContainer" style="display: none;">
-        <!-- Верхняя панель -->
-        <header class="admin-header">
-            <div class="header-left">
-                <div class="theme-toggle" id="themeToggle">
-                    <i class="fas fa-moon"></i>
-                </div>
-                <h1><i class="fas fa-tools"></i> Технопро — Админ-панель</h1>
-                <span class="version">v3.0</span>
+    <div class="app" id="app" style="display: none;">
+        <!-- БОКОВОЕ МЕНЮ -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">ТЕХНО<span>ПРО</span></div>
+                <div class="sidebar-subtitle">Админ-панель</div>
             </div>
-            <div class="header-right">
-                <div class="notification-bell" id="notificationBell">
-                    <i class="fas fa-bell"></i>
-                    <span class="notification-badge" id="notificationBadge">0</span>
-                </div>
-                <button id="exportExcelBtn" class="export-btn"><i class="fas fa-file-excel"></i> Экспорт Excel</button>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-page="dashboard"><i class="fas fa-chart-line"></i><span>Дашборд</span></a>
+                <a href="#" class="nav-item" data-page="requests"><i class="fas fa-inbox"></i><span>Заявки</span><span class="badge" id="newRequestsBadge">0</span></a>
+                <a href="#" class="nav-item" data-page="reviews"><i class="fas fa-star"></i><span>Отзывы</span></a>
+                <a href="#" class="nav-item" data-page="moderation"><i class="fas fa-clock"></i><span>Модерация</span><span class="badge" id="moderationBadge">0</span></a>
+                <a href="#" class="nav-item" data-page="services"><i class="fas fa-cogs"></i><span>Услуги</span></a>
+                <a href="#" class="nav-item" data-page="photos"><i class="fas fa-images"></i><span>Фотогалерея</span></a>
+                <a href="#" class="nav-item" data-page="settings"><i class="fas fa-sliders-h"></i><span>Настройки</span></a>
+            </nav>
+            <div class="sidebar-footer">
                 <button id="logoutBtn" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Выйти</button>
             </div>
-        </header>
+        </aside>
 
-        <!-- ДАШБОРД (карточки + график) -->
-        <div class="stats-grid">
-            <div class="stat-card total"><i class="fas fa-inbox"></i><div class="stat-info"><div class="stat-value" id="totalCount">0</div><div class="stat-label">Всего заявок</div></div></div>
-            <div class="stat-card new"><i class="fas fa-bell"></i><div class="stat-info"><div class="stat-value" id="newCount">0</div><div class="stat-label">Новых</div></div></div>
-            <div class="stat-card work"><i class="fas fa-wrench"></i><div class="stat-info"><div class="stat-value" id="workCount">0</div><div class="stat-label">В работе</div></div></div>
-            <div class="stat-card done"><i class="fas fa-check-circle"></i><div class="stat-info"><div class="stat-value" id="doneCount">0</div><div class="stat-label">Выполнено</div></div></div>
-        </div>
+        <!-- ОСНОВНОЙ КОНТЕНТ -->
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="top-bar-left">
+                    <button class="mobile-menu-toggle" id="mobileMenuToggle"><i class="fas fa-bars"></i></button>
+                    <h1 id="pageTitle">Дашборд</h1>
+                </div>
+                <div class="top-bar-right">
+                    <div class="theme-switch" id="themeSwitch"><i class="fas fa-moon"></i></div>
+                    <div class="admin-user"><i class="fas fa-user-shield"></i> Администратор</div>
+                </div>
+            </header>
 
-        <!-- ГРАФИК -->
-        <div class="chart-container">
-            <div class="chart-header">
-                <h3><i class="fas fa-chart-line"></i> Динамика заявок</h3>
-                <select id="chartPeriod">
-                    <option value="7">Последние 7 дней</option>
-                    <option value="14">Последние 14 дней</option>
-                    <option value="30" selected>Последние 30 дней</option>
-                    <option value="90">Последние 90 дней</option>
-                </select>
+            <div class="page-container">
+                <!-- ДАШБОРД -->
+                <div class="page active" id="dashboardPage">
+                    <div class="stats-grid">
+                        <div class="stat-card blue"><i class="fas fa-inbox"></i><div><div class="stat-value" id="statTotal">0</div><div class="stat-label">Всего заявок</div></div></div>
+                        <div class="stat-card orange"><i class="fas fa-bell"></i><div><div class="stat-value" id="statNew">0</div><div class="stat-label">Новых</div></div></div>
+                        <div class="stat-card cyan"><i class="fas fa-wrench"></i><div><div class="stat-value" id="statWork">0</div><div class="stat-label">В работе</div></div></div>
+                        <div class="stat-card green"><i class="fas fa-check-circle"></i><div><div class="stat-value" id="statDone">0</div><div class="stat-label">Выполнено</div></div></div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="card-header"><h3><i class="fas fa-chart-line"></i> Динамика заявок</h3><select id="chartPeriod"><option value="7">7 дней</option><option value="30" selected>30 дней</option><option value="90">90 дней</option></select></div>
+                        <canvas id="mainChart" height="100"></canvas>
+                    </div>
+                    <div class="quick-info-grid">
+                        <div class="info-card"><i class="fas fa-star"></i><div><div class="info-value" id="avgRating">0</div><div class="info-label">Средний рейтинг</div></div></div>
+                        <div class="info-card"><i class="fas fa-images"></i><div><div class="info-value" id="photosCount">0</div><div class="info-label">Фотографий</div></div></div>
+                        <div class="info-card"><i class="fas fa-tags"></i><div><div class="info-value" id="servicesCount">0</div><div class="info-label">Услуг</div></div></div>
+                    </div>
+                </div>
+
+                <!-- ЗАЯВКИ -->
+                <div class="page" id="requestsPage">
+                    <div class="page-header"><h2><i class="fas fa-inbox"></i> Управление заявками</h2></div>
+                    <div class="filters-bar">
+                        <div class="search-box"><i class="fas fa-search"></i><input type="text" id="reqSearch" placeholder="Поиск по имени, телефону..."></div>
+                        <select id="reqTypeFilter"><option value="all">Все типы</option><option value="repair">Ремонт</option><option value="business">Бизнес</option></select>
+                        <select id="reqStatusFilter"><option value="all">Все статусы</option><option value="new">Новые</option><option value="work">В работе</option><option value="done">Выполнено</option></select>
+                        <button id="reqResetFilters" class="btn-secondary"><i class="fas fa-undo"></i> Сбросить</button>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead><tr><th>ID</th><th>Дата</th><th>Имя</th><th>Телефон</th><th>Модель</th><th>Услуга</th><th>Статус</th><th>Действия</th></tr></thead>
+                            <tbody id="requestsTableBody"><tr><td colspan="8" class="text-center">Загрузка...</td></tr></tbody>
+                        </table>
+                    </div>
+                    <div class="pagination"><button id="reqPrevPage"><i class="fas fa-chevron-left"></i></button><span id="reqPageInfo">1</span><button id="reqNextPage"><i class="fas fa-chevron-right"></i></button></div>
+                </div>
+
+                <!-- ОТЗЫВЫ -->
+                <div class="page" id="reviewsPage">
+                    <div class="page-header"><h2><i class="fas fa-star"></i> Одобренные отзывы</h2><button id="exportReviewsBtn" class="btn-primary"><i class="fas fa-download"></i> Экспорт CSV</button></div>
+                    <div id="reviewsList" class="cards-list"></div>
+                </div>
+
+                <!-- МОДЕРАЦИЯ -->
+                <div class="page" id="moderationPage">
+                    <div class="page-header"><h2><i class="fas fa-clock"></i> Отзывы на модерации</h2></div>
+                    <div id="moderationList" class="cards-list"></div>
+                </div>
+
+                <!-- УСЛУГИ -->
+                <div class="page" id="servicesPage">
+                    <div class="page-header"><h2><i class="fas fa-cogs"></i> Услуги</h2><button id="addServiceBtn" class="btn-primary"><i class="fas fa-plus"></i> Добавить услугу</button></div>
+                    <div id="servicesList" class="cards-list"></div>
+                </div>
+
+                <!-- ФОТОГАЛЕРЕЯ -->
+                <div class="page" id="photosPage">
+                    <div class="page-header"><h2><i class="fas fa-images"></i> Фотогалерея</h2><button id="uploadPhotoMainBtn" class="btn-primary"><i class="fas fa-upload"></i> Загрузить фото</button></div>
+                    <div id="photosGallery" class="photos-grid"></div>
+                    <input type="file" id="photoUploadInput" accept="image/*" style="display: none;">
+                </div>
+
+                <!-- НАСТРОЙКИ -->
+                <div class="page" id="settingsPage">
+                    <div class="settings-grid">
+                        <div class="settings-card"><h3><i class="fas fa-key"></i> Смена пароля</h3><input type="password" id="newPassword" placeholder="Новый пароль"><input type="password" id="confirmPassword" placeholder="Подтвердите пароль"><button id="changePasswordBtn" class="btn-primary">Сохранить</button><div id="passwordMsg"></div></div>
+                        <div class="settings-card"><h3><i class="fas fa-database"></i> Управление данными</h3><button id="exportAllDataBtn" class="btn-secondary"><i class="fas fa-download"></i> Экспорт всех данных (JSON)</button><button id="clearAllDataBtn" class="btn-danger"><i class="fas fa-trash"></i> Очистить все данные</button></div>
+                        <div class="settings-card"><h3><i class="fas fa-palette"></i> Внешний вид</h3><button id="resetThemeBtn" class="btn-secondary">Сбросить тему</button></div>
+                    </div>
+                </div>
             </div>
-            <canvas id="requestsChart" height="100"></canvas>
-        </div>
+        </main>
+    </div>
 
-        <!-- ФИЛЬТРЫ -->
-        <div class="filters-bar">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Поиск по имени, телефону, услуге, модели...">
-            </div>
-            <div class="date-filter">
-                <i class="fas fa-calendar"></i>
-                <input type="date" id="dateFrom" placeholder="С">
-                <span>-</span>
-                <input type="date" id="dateTo" placeholder="По">
-            </div>
-            <div class="type-filter">
-                <i class="fas fa-filter"></i>
-                <select id="typeFilter">
-                    <option value="all">Все заявки</option>
-                    <option value="repair">Ремонт</option>
-                    <option value="business">Реклама / Бизнес</option>
-                </select>
-            </div>
-            <div class="status-filter">
-                <i class="fas fa-tag"></i>
-                <select id="statusFilter">
-                    <option value="all">Все статусы</option>
-                    <option value="new">Новые</option>
-                    <option value="work">В работе</option>
-                    <option value="done">Выполнено</option>
-                </select>
-            </div>
-            <button id="resetFiltersBtn" class="reset-btn"><i class="fas fa-undo"></i> Сбросить</button>
-        </div>
-
-        <!-- МАССОВЫЕ ДЕЙСТВИЯ -->
-        <div class="bulk-actions" id="bulkActions" style="display: none;">
-            <span>Выбрано: <strong id="selectedCount">0</strong></span>
-            <button id="bulkDoneBtn" class="bulk-btn"><i class="fas fa-check-circle"></i> Отметить как выполнено</button>
-            <button id="bulkDeleteBtn" class="bulk-btn delete"><i class="fas fa-trash"></i> Удалить</button>
-            <button id="bulkCancelBtn" class="bulk-btn cancel">Отмена</button>
-        </div>
-
-        <!-- ТАБЛИЦА -->
-        <div class="requests-table-container">
-            <table class="requests-table" id="requestsTable">
-                <thead>
-                    <tr>
-                        <th><input type="checkbox" id="selectAllCheckbox"></th>
-                        <th class="sortable" data-sort="id">ID <i class="fas fa-sort"></i></th>
-                        <th class="sortable" data-sort="date">Дата <i class="fas fa-sort"></i></th>
-                        <th>Имя</th>
-                        <th>Телефон</th>
-                        <th>Модель</th>
-                        <th>Услуга</th>
-                        <th class="sortable" data-sort="status">Статус <i class="fas fa-sort"></i></th>
-                        <th>Действия</th>
-                    </tr>
-                </thead>
-                <tbody id="requestsBody">
-                    <tr><td colspan="9" class="loading"><i class="fas fa-spinner fa-spin"></i> Загрузка...</td></tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- ПАГИНАЦИЯ -->
-        <div class="pagination" id="pagination">
-            <button id="prevPage" disabled><i class="fas fa-chevron-left"></i> Назад</button>
-            <span id="pageInfo">Страница 1 из 1</span>
-            <button id="nextPage" disabled>Вперед <i class="fas fa-chevron-right"></i></button>
+    <!-- МОДАЛЬНЫЕ ОКНА -->
+    <div class="modal" id="serviceModal">
+        <div class="modal-content"><div class="modal-header"><h3>Добавить услугу</h3><button class="modal-close">&times;</button></div>
+            <input type="text" id="modalServiceName" placeholder="Название услуги">
+            <select id="modalServiceCategory"><option value="phones">Телефоны</option><option value="consoles">Игровые приставки</option></select>
+            <input type="text" id="modalServicePrice" placeholder="Цена (от 1 500 ₽)">
+            <input type="text" id="modalServiceTime" placeholder="Время (30-50 мин)">
+            <button id="modalSaveServiceBtn" class="btn-primary">Сохранить</button>
         </div>
     </div>
 
-    <!-- МОДАЛКА КОММЕНТАРИЯ -->
-    <div class="modal-comment" id="commentModal">
-        <div class="modal-comment-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-edit"></i> Комментарий к заявке №<span id="commentRequestId"></span></h3>
-                <button class="modal-close" id="closeCommentModal">&times;</button>
-            </div>
-            <textarea id="commentText" rows="4" placeholder="Введите комментарий мастера (будет виден только вам)..."></textarea>
-            <div class="comment-history" id="commentHistory"></div>
-            <div class="modal-buttons">
-                <button id="saveCommentBtn" class="btn-save"><i class="fas fa-save"></i> Сохранить</button>
-                <button id="cancelCommentBtn" class="btn-cancel">Отмена</button>
-            </div>
+    <div class="modal" id="photoModal">
+        <div class="modal-content"><div class="modal-header"><h3>Информация о фото</h3><button class="modal-close">&times;</button></div>
+            <div id="photoModalPreview"></div>
+            <input type="text" id="photoModalTitle" placeholder="Название">
+            <select id="photoModalCategory"><option value="office">Сервисный центр</option><option value="team">Команда</option><option value="repair">Процесс ремонта</option></select>
+            <button id="photoModalSaveBtn" class="btn-primary">Сохранить</button>
+            <button id="photoModalDeleteBtn" class="btn-danger">Удалить</button>
         </div>
     </div>
-
-    <!-- МОДАЛКА ИСТОРИИ СТАТУСОВ -->
-    <div class="modal-history" id="historyModal">
-        <div class="modal-history-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-history"></i> История изменений</h3>
-                <button class="modal-close" id="closeHistoryModal">&times;</button>
-            </div>
-            <div id="historyList" class="history-list"></div>
-        </div>
-    </div>
-
-    <!-- ЗВУК УВЕДОМЛЕНИЯ (скрытый) -->
-    <audio id="notificationSound" preload="auto">
-        <source src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3" type="audio/mpeg">
-    </audio>
 
     <script src="admin.js"></script>
 </body>
