@@ -1,440 +1,399 @@
-const ADMIN_PASSWORD = 'TecnoPro2026Secure!';
-
+const ADMIN_PASSWORD = 'admin123';
 let allRequests = [];
+let allReviews = [];
+let allServices = [];
+let allPhotos = [];
 let currentPage = 1;
-let itemsPerPage = 20;
-let currentSort = { field: 'id', direction: 'desc' };
-let currentSearch = '';
-let currentDateFrom = '';
-let currentDateTo = '';
-let currentTypeFilter = 'all';
-let currentStatusFilter = 'all';
-let selectedRequests = new Set();
-let comments = JSON.parse(localStorage.getItem('tehno_comments') || '{}');
-let statusHistory = JSON.parse(localStorage.getItem('tehno_history') || '{}');
-let lastNewCount = 0;
-let notificationSound = null;
+let itemsPerPage = 15;
+let currentReqFilter = { search: '', type: 'all', status: 'all' };
+let currentChart = null;
 
-// ===== ТЁМНАЯ ТЕМА =====
-const themeToggle = document.getElementById('themeToggle');
-if (localStorage.getItem('theme') === 'dark') {
-    document.body.classList.add('dark-theme');
-    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-} else {
-    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-}
-themeToggle.addEventListener('click', () => {
-    document.body.classList.toggle('dark-theme');
-    if (document.body.classList.contains('dark-theme')) {
-        localStorage.setItem('theme', 'dark');
-        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-    } else {
-        localStorage.setItem('theme', 'light');
-        themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-    }
-});
-
-// ===== ЗВУК =====
-try {
-    notificationSound = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
-} catch(e) { console.log('Звук не загружен'); }
-
-// ===== ЛОГИН =====
-document.getElementById('loginBtn').addEventListener('click', () => {
-    const password = document.getElementById('passwordInput').value;
-    if (password === ADMIN_PASSWORD) {
-        document.getElementById('loginContainer').style.display = 'none';
-        document.getElementById('adminContainer').style.display = 'block';
-        loadRequests();
-        setInterval(() => { checkNewRequests(); loadStats(); }, 30000);
-        setInterval(loadStats, 30000);
-        initChart();
-    } else {
-        document.getElementById('loginError').textContent = 'Неверный пароль';
-    }
-});
-document.getElementById('passwordInput').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') document.getElementById('loginBtn').click();
-});
-document.getElementById('logoutBtn').addEventListener('click', () => {
-    document.getElementById('loginContainer').style.display = 'flex';
-    document.getElementById('adminContainer').style.display = 'none';
-    document.getElementById('passwordInput').value = '';
-});
-
-// ===== ФИЛЬТРЫ И ПОИСК =====
-document.getElementById('searchInput').addEventListener('input', (e) => {
-    currentSearch = e.target.value.toLowerCase();
-    currentPage = 1;
-    renderTable();
-});
-document.getElementById('dateFrom').addEventListener('change', (e) => {
-    currentDateFrom = e.target.value;
-    currentPage = 1;
-    renderTable();
-});
-document.getElementById('dateTo').addEventListener('change', (e) => {
-    currentDateTo = e.target.value;
-    currentPage = 1;
-    renderTable();
-});
-document.getElementById('typeFilter').addEventListener('change', (e) => {
-    currentTypeFilter = e.target.value;
-    currentPage = 1;
-    renderTable();
-});
-document.getElementById('statusFilter').addEventListener('change', (e) => {
-    currentStatusFilter = e.target.value;
-    currentPage = 1;
-    renderTable();
-});
-document.getElementById('resetFiltersBtn').addEventListener('click', () => {
-    document.getElementById('searchInput').value = '';
-    document.getElementById('dateFrom').value = '';
-    document.getElementById('dateTo').value = '';
-    document.getElementById('typeFilter').value = 'all';
-    document.getElementById('statusFilter').value = 'all';
-    currentSearch = '';
-    currentDateFrom = '';
-    currentDateTo = '';
-    currentTypeFilter = 'all';
-    currentStatusFilter = 'all';
-    currentPage = 1;
-    renderTable();
-});
-
-// ===== ПАГИНАЦИЯ =====
-document.getElementById('prevPage').addEventListener('click', () => {
-    if (currentPage > 1) { currentPage--; renderTable(); }
-});
-document.getElementById('nextPage').addEventListener('click', () => {
-    const totalPages = Math.ceil(getFilteredRequests().length / itemsPerPage);
-    if (currentPage < totalPages) { currentPage++; renderTable(); }
-});
-
-// ===== СОРТИРОВКА =====
-document.querySelectorAll('.sortable').forEach(th => {
-    th.addEventListener('click', () => {
-        const field = th.getAttribute('data-sort');
-        if (currentSort.field === field) {
-            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
-        } else {
-            currentSort.field = field;
-            currentSort.direction = 'asc';
-        }
-        renderTable();
-    });
-});
-
-// ===== МАССОВЫЕ ДЕЙСТВИЯ =====
-const selectAllCheckbox = document.getElementById('selectAllCheckbox');
-selectAllCheckbox.addEventListener('change', (e) => {
-    const filtered = getFilteredRequests();
-    const start = (currentPage - 1) * itemsPerPage;
-    const paginated = filtered.slice(start, start + itemsPerPage);
-    if (e.target.checked) {
-        paginated.forEach(r => selectedRequests.add(r.id));
-    } else {
-        paginated.forEach(r => selectedRequests.delete(r.id));
-    }
-    updateBulkActions();
-    renderTable();
-});
-document.getElementById('bulkDoneBtn').addEventListener('click', async () => {
-    for (const id of selectedRequests) {
-        await fetch(`/api/request/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status: 'done' })
-        });
-        addToHistory(id, 'done', 'Массовое изменение');
-    }
-    selectedRequests.clear();
-    updateBulkActions();
-    loadRequests();
-});
-document.getElementById('bulkDeleteBtn').addEventListener('click', async () => {
-    if (!confirm(`Удалить ${selectedRequests.size} заявок?`)) return;
-    for (const id of selectedRequests) {
-        await fetch(`/api/request/${id}`, { method: 'DELETE' });
-        delete comments[id];
-    }
-    localStorage.setItem('tehno_comments', JSON.stringify(comments));
-    selectedRequests.clear();
-    updateBulkActions();
-    loadRequests();
-});
-document.getElementById('bulkCancelBtn').addEventListener('click', () => {
-    selectedRequests.clear();
-    updateBulkActions();
-    renderTable();
-});
-
-// ===== ЭКСПОРТ EXCEL =====
-document.getElementById('exportExcelBtn').addEventListener('click', exportToExcel);
-
-// ===== ГРАФИК =====
-let chart = null;
-async function initChart() {
-    const ctx = document.getElementById('requestsChart').getContext('2d');
-    chart = new Chart(ctx, {
-        type: 'line',
-        data: { labels: [], datasets: [{ label: 'Заявки', data: [], borderColor: '#00a8ff', backgroundColor: 'rgba(0,168,255,0.1)', fill: true }] },
-        options: { responsive: true, maintainAspectRatio: true }
-    });
-    updateChart();
-}
-document.getElementById('chartPeriod').addEventListener('change', () => updateChart());
-async function updateChart() {
-    const period = parseInt(document.getElementById('chartPeriod').value);
-    const now = new Date();
-    const dates = [];
-    const counts = [];
-    for (let i = period - 1; i >= 0; i--) {
-        const d = new Date(now);
-        d.setDate(now.getDate() - i);
-        const dateStr = d.toISOString().slice(0,10);
-        dates.push(dateStr.slice(5));
-        const count = allRequests.filter(r => r.created_at.slice(0,10) === dateStr).length;
-        counts.push(count);
-    }
-    if (chart) {
-        chart.data.labels = dates;
-        chart.data.datasets[0].data = counts;
-        chart.update();
-    }
+// ===== ИНИЦИАЛИЗАЦИЯ =====
+async function init() {
+    await loadRequests();
+    loadReviews();
+    loadServices();
+    loadPhotos();
+    updateStats();
+    setupEventListeners();
+    renderCurrentPage();
 }
 
-// ===== УВЕДОМЛЕНИЯ =====
-async function checkNewRequests() {
-    const res = await fetch('/api/stats');
-    const data = await res.json();
-    if (data.new_count > lastNewCount) {
-        document.getElementById('notificationBadge').textContent = data.new_count - lastNewCount;
-        if (notificationSound) notificationSound.play();
-        document.getElementById('notificationBell').style.animation = 'none';
-        setTimeout(() => { document.getElementById('notificationBell').style.animation = ''; }, 100);
-    }
-    lastNewCount = data.new_count;
-}
-setInterval(checkNewRequests, 10000);
-
-// ===== ОСНОВНЫЕ ФУНКЦИИ =====
 async function loadRequests() {
     try {
         const res = await fetch('/api/requests');
         allRequests = await res.json();
         updateStats();
         updateChart();
-        renderTable();
-    } catch (err) {
-        document.getElementById('requestsBody').innerHTML = '<tr><td colspan="9">Ошибка загрузки</td></tr>';
-    }
+        renderRequestsTable();
+    } catch(e) { console.error(e); }
 }
+
+function loadReviews() {
+    const saved = localStorage.getItem('tehno_reviews');
+    allReviews = saved ? JSON.parse(saved) : [
+        { id: 1, name: "Анна К.", rating: 5, text: "Отлично починили iPhone!", date: "12.05.2025", status: "approved" },
+        { id: 2, name: "Дмитрий П.", rating: 5, text: "Быстро и качественно", date: "05.05.2025", status: "approved" }
+    ];
+    localStorage.setItem('tehno_reviews', JSON.stringify(allReviews));
+    renderReviews();
+    renderModeration();
+    updateModerationBadge();
+}
+
+function loadServices() {
+    const saved = localStorage.getItem('tehno_services');
+    allServices = saved ? JSON.parse(saved) : [
+        { id: 1, name: "Замена экрана", category: "phones", price: "от 1 500 ₽", time: "30-50 мин" },
+        { id: 2, name: "Замена аккумулятора", category: "phones", price: "от 1 200 ₽", time: "20-40 мин" },
+        { id: 7, name: "Диагностика консоли", category: "consoles", price: "0 ₽", time: "20-40 мин" }
+    ];
+    localStorage.setItem('tehno_services', JSON.stringify(allServices));
+    renderServices();
+    document.getElementById('servicesCount').innerText = allServices.length;
+}
+
+function loadPhotos() {
+    const saved = localStorage.getItem('tehno_photos');
+    allPhotos = saved ? JSON.parse(saved) : [
+        { id: 1, name: "office.jpg", url: "/images/office.jpg", category: "office", title: "Сервисный центр" },
+        { id: 2, name: "team.jpg", url: "/images/team.jpg", category: "team", title: "Наша команда" },
+        { id: 3, name: "repair1.jpg", url: "/images/repair1.jpg", category: "repair", title: "Процесс ремонта" }
+    ];
+    localStorage.setItem('tehno_photos', JSON.stringify(allPhotos));
+    renderPhotosGallery();
+    document.getElementById('photosCount').innerText = allPhotos.length;
+}
+
+// ===== СТАТИСТИКА И ГРАФИК =====
 function updateStats() {
-    const total = allRequests.length;
-    const newCount = allRequests.filter(r => r.status === 'new').length;
-    const workCount = allRequests.filter(r => r.status === 'work').length;
-    const doneCount = allRequests.filter(r => r.status === 'done').length;
-    document.getElementById('totalCount').textContent = total;
-    document.getElementById('newCount').textContent = newCount;
-    document.getElementById('workCount').textContent = workCount;
-    document.getElementById('doneCount').textContent = doneCount;
-    document.getElementById('notificationBadge').textContent = newCount;
-    lastNewCount = newCount;
+    document.getElementById('statTotal').innerText = allRequests.length;
+    document.getElementById('statNew').innerText = allRequests.filter(r => r.status === 'new').length;
+    document.getElementById('statWork').innerText = allRequests.filter(r => r.status === 'work').length;
+    document.getElementById('statDone').innerText = allRequests.filter(r => r.status === 'done').length;
+    document.getElementById('newRequestsBadge').innerText = allRequests.filter(r => r.status === 'new').length;
+    const avgRating = allReviews.filter(r => r.status === 'approved').reduce((s,r,i,a) => s + r.rating / a.length, 0);
+    document.getElementById('avgRating').innerText = avgRating.toFixed(1) + ' ★';
 }
-function getFilteredRequests() {
+
+function updateChart() {
+    const period = parseInt(document.getElementById('chartPeriod')?.value || 30);
+    const ctx = document.getElementById('mainChart')?.getContext('2d');
+    if(!ctx) return;
+    const counts = [];
+    for(let i=period-1; i>=0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const dateStr = d.toISOString().slice(0,10);
+        counts.push(allRequests.filter(r => r.created_at?.slice(0,10) === dateStr).length);
+    }
+    if(currentChart) currentChart.destroy();
+    currentChart = new Chart(ctx, {
+        type: 'line',
+        data: { labels: Array.from({length:period},(_,i)=>i+1), datasets: [{ label: 'Заявки', data: counts, borderColor: '#00a8ff', backgroundColor: 'rgba(0,168,255,0.1)', fill: true, tension: 0.3 }] },
+        options: { responsive: true, maintainAspectRatio: true }
+    });
+}
+
+// ===== ЗАЯВКИ =====
+function renderRequestsTable() {
     let filtered = [...allRequests];
-    if (currentSearch) {
+    if(currentReqFilter.search) {
         filtered = filtered.filter(r => 
-            r.name.toLowerCase().includes(currentSearch) ||
-            r.phone.toLowerCase().includes(currentSearch) ||
-            (r.service && r.service.toLowerCase().includes(currentSearch)) ||
-            (r.model && r.model.toLowerCase().includes(currentSearch))
+            r.name?.toLowerCase().includes(currentReqFilter.search) ||
+            r.phone?.includes(currentReqFilter.search) ||
+            r.service?.toLowerCase().includes(currentReqFilter.search)
         );
     }
-    if (currentTypeFilter !== 'all') {
-        filtered = filtered.filter(r => r.type === currentTypeFilter);
-    }
-    if (currentStatusFilter !== 'all') {
-        filtered = filtered.filter(r => r.status === currentStatusFilter);
-    }
-    if (currentDateFrom) {
-        filtered = filtered.filter(r => r.created_at.slice(0,10) >= currentDateFrom);
-    }
-    if (currentDateTo) {
-        filtered = filtered.filter(r => r.created_at.slice(0,10) <= currentDateTo);
-    }
-    filtered.sort((a, b) => {
-        let valA = a[currentSort.field];
-        let valB = b[currentSort.field];
-        if (currentSort.field === 'date') {
-            valA = new Date(a.created_at);
-            valB = new Date(b.created_at);
-        }
-        if (valA < valB) return currentSort.direction === 'asc' ? -1 : 1;
-        if (valA > valB) return currentSort.direction === 'asc' ? 1 : -1;
-        return 0;
-    });
-    return filtered;
-}
-function updateBulkActions() {
-    const bulkDiv = document.getElementById('bulkActions');
-    if (selectedRequests.size > 0) {
-        bulkDiv.style.display = 'flex';
-        document.getElementById('selectedCount').textContent = selectedRequests.size;
-    } else {
-        bulkDiv.style.display = 'none';
-    }
-}
-function renderTable() {
-    const filtered = getFilteredRequests();
-    const totalPages = Math.ceil(filtered.length / itemsPerPage);
-    const start = (currentPage - 1) * itemsPerPage;
-    const paginated = filtered.slice(start, start + itemsPerPage);
-    document.getElementById('pageInfo').textContent = `Страница ${currentPage} из ${totalPages || 1}`;
-    document.getElementById('prevPage').disabled = currentPage === 1;
-    document.getElementById('nextPage').disabled = currentPage === totalPages || totalPages === 0;
-    if (paginated.length === 0) {
-        document.getElementById('requestsBody').innerHTML = '<tr><td colspan="9">Нет заявок</td></tr>';
-        return;
-    }
-    const pageIds = new Set(paginated.map(r => r.id));
-    const allSelected = paginated.length > 0 && paginated.every(r => selectedRequests.has(r.id));
-    selectAllCheckbox.checked = allSelected;
-    selectAllCheckbox.indeterminate = !allSelected && paginated.some(r => selectedRequests.has(r.id));
-    document.getElementById('requestsBody').innerHTML = paginated.map(req => `
-        <tr data-id="${req.id}">
-            <td><input type="checkbox" class="row-checkbox" data-id="${req.id}" ${selectedRequests.has(req.id) ? 'checked' : ''}></td>
-            <td>${req.id}</td>
-            <td>${new Date(req.created_at).toLocaleString()}</td>
-            <td>${escapeHtml(req.name)}</td>
-            <td>${escapeHtml(req.phone)}</td>
-            <td>${escapeHtml(req.model || '-')}</td>
-            <td>${escapeHtml(req.service || req.type)}</td>
-            <td>${getStatusBadge(req.status)}</td>
+    if(currentReqFilter.type !== 'all') filtered = filtered.filter(r => r.type === currentReqFilter.type);
+    if(currentReqFilter.status !== 'all') filtered = filtered.filter(r => r.status === currentReqFilter.status);
+    const total = Math.ceil(filtered.length / itemsPerPage);
+    const start = (currentPage-1)*itemsPerPage;
+    const page = filtered.slice(start, start+itemsPerPage);
+    document.getElementById('reqPageInfo').innerText = `${currentPage}/${total||1}`;
+    const tbody = document.getElementById('requestsTableBody');
+    if(!page.length) { tbody.innerHTML = '<td><td colspan="8" class="text-center">Нет заявок</td></tr>'; return; }
+    tbody.innerHTML = page.map(r => `
+        <tr>
+            <td>${r.id}</td>
+            <td>${new Date(r.created_at).toLocaleString()}</td>
+            <td>${escapeHtml(r.name)}</td>
+            <td>${escapeHtml(r.phone)}</td>
+            <td>${escapeHtml(r.model || '-')}</td>
+            <td>${escapeHtml(r.service || r.type)}</td>
+            <td><span class="status-badge status-${r.status}">${r.status === 'new' ? 'Новая' : r.status === 'work' ? 'В работе' : 'Выполнено'}</span></td>
             <td class="action-buttons">
-                ${req.status !== 'work' ? `<button class="action-btn action-work" onclick="updateStatus(${req.id}, 'work')"><i class="fas fa-tools"></i></button>` : ''}
-                ${req.status !== 'done' ? `<button class="action-btn action-done" onclick="updateStatus(${req.id}, 'done')"><i class="fas fa-check"></i></button>` : ''}
-                <button class="action-btn action-call" onclick="window.open('tel:${req.phone}')"><i class="fas fa-phone"></i></button>
-                <button class="action-btn action-comment" onclick="openCommentModal(${req.id})"><i class="fas fa-comment"></i>${comments[req.id] ? '✏️' : ''}</button>
-                <button class="action-btn action-history" onclick="openHistoryModal(${req.id})"><i class="fas fa-history"></i></button>
-                <button class="action-btn action-delete" onclick="deleteRequest(${req.id})"><i class="fas fa-trash"></i></button>
+                ${r.status !== 'work' ? `<button class="action-btn action-work" onclick="updateRequestStatus(${r.id}, 'work')">В работу</button>` : ''}
+                ${r.status !== 'done' ? `<button class="action-btn action-done" onclick="updateRequestStatus(${r.id}, 'done')">Выполнить</button>` : ''}
+                <button class="action-btn action-delete" onclick="deleteRequest(${r.id})">Удалить</button>
             </td>
         </tr>
     `).join('');
-    document.querySelectorAll('.row-checkbox').forEach(cb => {
-        cb.addEventListener('change', (e) => {
-            const id = parseInt(e.target.getAttribute('data-id'));
-            if (e.target.checked) selectedRequests.add(id);
-            else selectedRequests.delete(id);
-            updateBulkActions();
-            renderTable();
-        });
-    });
 }
-function getStatusBadge(status) {
-    const labels = { new: 'Новая', work: 'В работе', done: 'Выполнено' };
-    const classes = { new: 'status-new', work: 'status-work', done: 'status-done' };
-    return `<span class="status-badge ${classes[status] || ''}">${labels[status] || status}</span>`;
-}
-window.updateStatus = async (id, status) => {
-    try {
-        await fetch(`/api/request/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status })
-        });
-        addToHistory(id, status);
-        loadRequests();
-    } catch (err) {}
+
+window.updateRequestStatus = async (id, status) => {
+    await fetch(`/api/request/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({status}) });
+    loadRequests();
 };
 window.deleteRequest = async (id) => {
-    if (!confirm('Удалить заявку?')) return;
-    try {
-        await fetch(`/api/request/${id}`, { method: 'DELETE' });
-        delete comments[id];
-        localStorage.setItem('tehno_comments', JSON.stringify(comments));
-        selectedRequests.delete(id);
-        loadRequests();
-    } catch (err) {}
+    if(!confirm('Удалить заявку?')) return;
+    await fetch(`/api/request/${id}`, { method: 'DELETE' });
+    loadRequests();
 };
-function addToHistory(id, newStatus, note = '') {
-    const history = statusHistory[id] || [];
-    history.unshift({
-        date: new Date().toLocaleString(),
-        status: newStatus,
-        note: note
+
+// ===== ОТЗЫВЫ =====
+function renderReviews() {
+    const container = document.getElementById('reviewsList');
+    if(!container) return;
+    const approved = allReviews.filter(r => r.status === 'approved');
+    if(approved.length === 0) { container.innerHTML = '<div class="review-card">Нет отзывов</div>'; return; }
+    container.innerHTML = approved.map(r => `
+        <div class="review-card">
+            <div class="review-header"><span class="review-name">${escapeHtml(r.name)}</span><span class="review-rating">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span></div>
+            <div class="review-text">${escapeHtml(r.text)}</div>
+            <div class="review-date">${r.date}</div>
+            <div class="review-actions"><button onclick="deleteReview(${r.id})" class="btn-delete">Удалить</button></div>
+        </div>
+    `).join('');
+}
+
+function renderModeration() {
+    const container = document.getElementById('moderationList');
+    if(!container) return;
+    const pending = allReviews.filter(r => r.status === 'pending');
+    if(pending.length === 0) { container.innerHTML = '<div class="review-card">Нет отзывов на модерации</div>'; return; }
+    container.innerHTML = pending.map(r => `
+        <div class="review-card">
+            <div class="review-header"><span class="review-name">${escapeHtml(r.name)}</span><span class="review-rating">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span></div>
+            <div class="review-text">${escapeHtml(r.text)}</div>
+            <div class="review-date">${r.date}</div>
+            <div class="review-actions"><button onclick="approveReview(${r.id})" class="btn-approve">Одобрить</button><button onclick="rejectReview(${r.id})" class="btn-reject">Отклонить</button></div>
+        </div>
+    `).join('');
+}
+
+function updateModerationBadge() {
+    const pending = allReviews.filter(r => r.status === 'pending').length;
+    const badge = document.getElementById('moderationBadge');
+    if(badge) {
+        badge.innerText = pending;
+        badge.style.display = pending > 0 ? 'inline-block' : 'none';
+    }
+}
+window.approveReview = (id) => {
+    const idx = allReviews.findIndex(r => r.id === id);
+    if(idx !== -1) { allReviews[idx].status = 'approved'; localStorage.setItem('tehno_reviews', JSON.stringify(allReviews)); renderReviews(); renderModeration(); updateModerationBadge(); updateStats(); }
+};
+window.rejectReview = (id) => {
+    allReviews = allReviews.filter(r => r.id !== id);
+    localStorage.setItem('tehno_reviews', JSON.stringify(allReviews));
+    renderReviews(); renderModeration(); updateModerationBadge();
+};
+window.deleteReview = (id) => {
+    allReviews = allReviews.filter(r => r.id !== id);
+    localStorage.setItem('tehno_reviews', JSON.stringify(allReviews));
+    renderReviews(); renderModeration(); updateModerationBadge();
+};
+
+// ===== УСЛУГИ =====
+function renderServices() {
+    const container = document.getElementById('servicesList');
+    if(!container) return;
+    if(allServices.length === 0) { container.innerHTML = '<div class="service-card">Нет услуг</div>'; return; }
+    container.innerHTML = allServices.map(s => `
+        <div class="service-card">
+            <div class="service-header"><strong>${escapeHtml(s.name)}</strong><span>${s.price} | ${s.time}</span></div>
+            <div class="service-actions"><button onclick="deleteService(${s.id})" class="btn-delete">Удалить</button></div>
+        </div>
+    `).join('');
+}
+window.deleteService = (id) => {
+    allServices = allServices.filter(s => s.id !== id);
+    localStorage.setItem('tehno_services', JSON.stringify(allServices));
+    renderServices();
+    document.getElementById('servicesCount').innerText = allServices.length;
+};
+
+// ===== ФОТОГАЛЕРЕЯ (С УДАЛЕНИЕМ) =====
+function renderPhotosGallery() {
+    const container = document.getElementById('photosGallery');
+    if(!container) return;
+    const categories = [
+        { id: 'office', name: 'Сервисный центр', icon: 'fa-building' },
+        { id: 'team', name: 'Команда', icon: 'fa-users' },
+        { id: 'repair', name: 'Процесс ремонта', icon: 'fa-tools' }
+    ];
+    let html = '';
+    categories.forEach(cat => {
+        const catPhotos = allPhotos.filter(p => p.category === cat.id);
+        html += `<div class="photo-category"><div class="photo-category-header"><i class="fas ${cat.icon}"></i><h4>${cat.name}</h4><span class="photo-count">${catPhotos.length} фото</span></div><div class="photos-grid">`;
+        catPhotos.forEach(photo => {
+            html += `
+                <div class="photo-card" data-id="${photo.id}">
+                    <img src="${photo.url}" onerror="this.src='https://placehold.co/200x150/1e3a5f/white?text=No+Image'">
+                    <div class="photo-info">
+                        <div class="photo-title">${escapeHtml(photo.title)}</div>
+                        <div class="photo-cat">${cat.name}</div>
+                    </div>
+                    <div class="photo-actions">
+                        <button class="photo-delete-btn" onclick="deletePhoto(${photo.id})" title="Удалить"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `;
+        });
+        html += `<div class="photo-card add-photo-card" data-category="${cat.id}"><i class="fas fa-plus"></i><span>Добавить фото</span></div>`;
+        html += `</div></div>`;
     });
-    statusHistory[id] = history.slice(0, 20);
-    localStorage.setItem('tehno_history', JSON.stringify(statusHistory));
+    container.innerHTML = html;
+    
+    document.querySelectorAll('.add-photo-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+            e.stopPropagation();
+            currentUploadCategory = card.dataset.category;
+            document.getElementById('photoUploadInput').click();
+        });
+    });
 }
-function openCommentModal(id) {
-    currentCommentId = id;
-    document.getElementById('commentRequestId').textContent = id;
-    document.getElementById('commentText').value = comments[id] || '';
-    const historyDiv = document.getElementById('commentHistory');
-    const hist = statusHistory[id] || [];
-    if (hist.length > 0) {
-        historyDiv.innerHTML = '<strong>Последние изменения:</strong><br>' + 
-            hist.slice(0, 3).map(h => `<div>${h.date} → ${h.status}</div>`).join('');
-    } else {
-        historyDiv.innerHTML = '';
+
+let currentUploadCategory = 'office';
+
+document.getElementById('photoUploadInput')?.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if(!file) {
+        e.target.value = '';
+        return;
     }
-    document.getElementById('commentModal').classList.add('active');
-}
-function openHistoryModal(id) {
-    const history = statusHistory[id] || [];
-    const listDiv = document.getElementById('historyList');
-    if (history.length === 0) {
-        listDiv.innerHTML = '<div class="history-item">История пуста</div>';
-    } else {
-        listDiv.innerHTML = history.map(h => `
-            <div class="history-item">
-                <div class="history-date">${h.date}</div>
-                <div>Статус изменён на: <strong>${h.status}</strong></div>
-                ${h.note ? `<div>${h.note}</div>` : ''}
-            </div>
-        `).join('');
+    if (!file.type.startsWith('image/')) {
+        alert('Пожалуйста, выберите изображение');
+        e.target.value = '';
+        return;
     }
-    document.getElementById('historyModal').classList.add('active');
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+        const newId = Date.now();
+        const title = prompt('Введите название фото:', 'Новое фото') || 'Новое фото';
+        if (!title) return;
+        allPhotos.push({ 
+            id: newId, 
+            name: file.name, 
+            url: ev.target.result, 
+            category: currentUploadCategory, 
+            title: title,
+            date: new Date().toISOString().slice(0,10)
+        });
+        localStorage.setItem('tehno_photos', JSON.stringify(allPhotos));
+        renderPhotosGallery();
+        document.getElementById('photosCount').innerText = allPhotos.length;
+        updateSitePhotos();
+        alert('Фото добавлено!');
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+});
+
+window.deletePhoto = (id) => {
+    if(!confirm('Удалить это фото? Оно исчезнет с сайта.')) return;
+    allPhotos = allPhotos.filter(p => p.id !== id);
+    localStorage.setItem('tehno_photos', JSON.stringify(allPhotos));
+    renderPhotosGallery();
+    document.getElementById('photosCount').innerText = allPhotos.length;
+    updateSitePhotos();
+    alert('Фото удалено');
+};
+
+function updateSitePhotos() { 
+    localStorage.setItem('tehno_photos_global', JSON.stringify(allPhotos)); 
 }
-document.getElementById('closeCommentModal').addEventListener('click', () => {
-    document.getElementById('commentModal').classList.remove('active');
+
+// ===== НАСТРОЙКИ =====
+document.getElementById('exportAllDataBtn')?.addEventListener('click', () => {
+    const data = { requests: allRequests, reviews: allReviews, services: allServices, photos: allPhotos };
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+    const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `tehnopro_data_${new Date().toISOString().slice(0,19)}.json`; link.click();
 });
-document.getElementById('closeHistoryModal').addEventListener('click', () => {
-    document.getElementById('historyModal').classList.remove('active');
-});
-document.getElementById('cancelCommentBtn').addEventListener('click', () => {
-    document.getElementById('commentModal').classList.remove('active');
-});
-document.getElementById('saveCommentBtn').addEventListener('click', () => {
-    const comment = document.getElementById('commentText').value;
-    if (comment.trim()) {
-        comments[currentCommentId] = comment;
-    } else {
-        delete comments[currentCommentId];
+document.getElementById('clearAllDataBtn')?.addEventListener('click', () => {
+    if(confirm('Очистить ВСЕ отзывы, услуги и фото?')) {
+        localStorage.removeItem('tehno_reviews');
+        localStorage.removeItem('tehno_services');
+        localStorage.removeItem('tehno_photos');
+        loadReviews(); loadServices(); loadPhotos();
     }
-    localStorage.setItem('tehno_comments', JSON.stringify(comments));
-    document.getElementById('commentModal').classList.remove('active');
-    renderTable();
 });
-let currentCommentId = null;
-function exportToExcel() {
-    const filtered = getFilteredRequests();
-    const headers = ['ID', 'Дата', 'Тип', 'Имя', 'Телефон', 'Модель', 'Услуга', 'Статус', 'Комментарий'];
-    const rows = filtered.map(r => [
-        r.id, new Date(r.created_at).toLocaleString(), r.type === 'repair' ? 'Ремонт' : 'Бизнес',
-        r.name, r.phone, r.model || '', r.service || '', r.status, comments[r.id] || ''
-    ]);
-    const csvContent = [headers, ...rows].map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(';')).join('\n');
-    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `tehnopro_${new Date().toISOString().slice(0,19)}.csv`;
-    link.click();
+document.getElementById('changePasswordBtn')?.addEventListener('click', () => {
+    const p1 = document.getElementById('newPassword').value;
+    const p2 = document.getElementById('confirmPassword').value;
+    if(p1 !== p2) { document.getElementById('passwordMsg').innerText = 'Пароли не совпадают'; return; }
+    if(p1.length < 6) { document.getElementById('passwordMsg').innerText = 'Минимум 6 символов'; return; }
+    document.getElementById('passwordMsg').innerHTML = '<span style="color:#10b981">✓ Пароль изменён (только для сессии)</span>';
+});
+
+// ===== НАВИГАЦИЯ =====
+function setupEventListeners() {
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            item.classList.add('active');
+            const pageId = item.dataset.page + 'Page';
+            document.getElementById(pageId).classList.add('active');
+            document.getElementById('pageTitle').innerText = item.querySelector('span').innerText;
+            if(pageId === 'dashboardPage') updateChart();
+            if(pageId === 'reviewsPage') renderReviews();
+            if(pageId === 'moderationPage') renderModeration();
+            if(pageId === 'servicesPage') renderServices();
+            if(pageId === 'photosPage') renderPhotosGallery();
+        });
+    });
+    document.getElementById('reqSearch')?.addEventListener('input', (e) => { currentReqFilter.search = e.target.value.toLowerCase(); currentPage=1; renderRequestsTable(); });
+    document.getElementById('reqTypeFilter')?.addEventListener('change', (e) => { currentReqFilter.type = e.target.value; currentPage=1; renderRequestsTable(); });
+    document.getElementById('reqStatusFilter')?.addEventListener('change', (e) => { currentReqFilter.status = e.target.value; currentPage=1; renderRequestsTable(); });
+    document.getElementById('reqResetFilters')?.addEventListener('click', () => {
+        document.getElementById('reqSearch').value = '';
+        document.getElementById('reqTypeFilter').value = 'all';
+        document.getElementById('reqStatusFilter').value = 'all';
+        currentReqFilter = { search: '', type: 'all', status: 'all' };
+        currentPage = 1;
+        renderRequestsTable();
+    });
+    document.getElementById('reqPrevPage')?.addEventListener('click', () => { if(currentPage>1){currentPage--; renderRequestsTable();} });
+    document.getElementById('reqNextPage')?.addEventListener('click', () => { currentPage++; renderRequestsTable(); });
+    document.getElementById('chartPeriod')?.addEventListener('change', () => updateChart());
+    document.getElementById('addServiceBtn')?.addEventListener('click', () => {
+        const name = prompt('Название услуги:'); if(!name) return;
+        const category = confirm('Телефон? (ОК - да, Отмена - приставка)') ? 'phones' : 'consoles';
+        const price = prompt('Цена:'); const time = prompt('Время:');
+        const newId = Date.now();
+        allServices.push({ id: newId, name, category, price, time });
+        localStorage.setItem('tehno_services', JSON.stringify(allServices));
+        renderServices();
+        document.getElementById('servicesCount').innerText = allServices.length;
+    });
+    document.getElementById('uploadPhotoMainBtn')?.addEventListener('click', () => { currentUploadCategory = 'office'; document.getElementById('photoUploadInput').click(); });
+    document.getElementById('resetThemeBtn')?.addEventListener('click', () => { localStorage.removeItem('theme'); document.body.classList.remove('dark-theme'); });
+    document.getElementById('themeSwitch')?.addEventListener('click', () => { document.body.classList.toggle('dark-theme'); });
+    document.getElementById('mobileMenuToggle')?.addEventListener('click', () => { document.querySelector('.sidebar').classList.toggle('mobile-open'); });
+    document.getElementById('exportReviewsBtn')?.addEventListener('click', () => {
+        const csv = [['Имя','Рейтинг','Текст','Дата']];
+        allReviews.filter(r => r.status === 'approved').forEach(r => csv.push([r.name, r.rating, r.text, r.date]));
+        const blob = new Blob(['\uFEFF' + csv.map(row => row.join(';')).join('\n')], {type:'text/csv'});
+        const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'reviews.csv'; link.click();
+    });
 }
-function escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
-}
+
+// ===== ВХОД =====
+document.getElementById('loginSubmitBtn')?.addEventListener('click', () => {
+    if(document.getElementById('loginPassword').value === ADMIN_PASSWORD) {
+        document.getElementById('loginOverlay').style.display = 'none';
+        document.getElementById('app').style.display = 'flex';
+        init();
+    } else { document.getElementById('loginErrorMsg').innerText = 'Неверный пароль'; }
+});
+document.getElementById('loginPassword')?.addEventListener('keypress', (e) => { if(e.key === 'Enter') document.getElementById('loginSubmitBtn').click(); });
+document.getElementById('logoutBtn')?.addEventListener('click', () => {
+    document.getElementById('loginOverlay').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('loginPassword').value = '';
+});
+
+function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
