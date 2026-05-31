@@ -1,21 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // ===== CSRF-ТОКЕН =====
-    let csrfToken = null;
-    
-    async function getCsrfToken() {
-        try {
-            const res = await fetch('/api/csrf-token');
-            const data = await res.json();
-            csrfToken = data.csrfToken;
-            return csrfToken;
-        } catch (err) {
-            console.error('Ошибка получения CSRF-токена:', err);
-            return null;
-        }
-    }
-    
-    getCsrfToken();
-    
     // ===== СЛАЙДЕР =====
     let currentSlide = 0;
     const slides = document.querySelectorAll('.slider-slide');
@@ -97,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target === modal) modal.classList.remove('active');
     });
     
-    // ===== ОТПРАВКА ФОРМЫ ЗАПИСИ =====
+    // ===== ОТПРАВКА ФОРМЫ ЗАПИСИ (БЕЗ CSRF) =====
     const quickForm = document.getElementById('quickForm');
     const modalStatus = document.getElementById('modalStatus');
     
@@ -132,16 +115,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             
-            const token = await getCsrfToken();
-            if (!token) {
-                if (modalStatus) {
-                    modalStatus.innerHTML = 'Ошибка безопасности. Обновите страницу.';
-                    modalStatus.style.color = '#f97316';
-                }
-                if (submitBtn) submitBtn.disabled = false;
-                return;
-            }
-            
             if (modalStatus) {
                 modalStatus.innerHTML = 'Отправка...';
                 modalStatus.style.color = '#94a3b8';
@@ -157,9 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         phone: phone,
                         model: model || '',
                         service: service,
-                        time: time || '',
-                        comment: comment || '',
-                        csrfToken: token
+                        message: (time ? 'Время: ' + time + '\n' : '') + (comment || '')
                     })
                 });
                 
@@ -244,16 +215,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             
-            const token = await getCsrfToken();
-            if (!token) {
-                if (businessStatus) {
-                    businessStatus.innerHTML = 'Ошибка безопасности. Обновите страницу.';
-                    businessStatus.style.color = '#f97316';
-                }
-                if (submitBtn) submitBtn.disabled = false;
-                return;
-            }
-            
             if (businessStatus) businessStatus.innerHTML = 'Отправка...';
             
             try {
@@ -265,8 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         name: name,
                         phone: phone,
                         email: email || '',
-                        service: 'Рекламный контракт',
-                        csrfToken: token
+                        service: 'Рекламный контракт'
                     })
                 });
                 
