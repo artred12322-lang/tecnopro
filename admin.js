@@ -8,7 +8,22 @@ let itemsPerPage = 15;
 let currentFilter = { search: '', type: 'all', status: 'all' };
 let currentChart = null;
 
-// ===== ЗАГРУЗКА ДАННЫХ =====
+// ПРИНУДИТЕЛЬНЫЙ СПИСОК ВСЕХ УСЛУГ
+const FORCED_SERVICES = [
+    { id: 1, name: "Замена экрана", category: "phones", price: "от 1 500 ₽", time: "30-50 мин" },
+    { id: 2, name: "Замена аккумулятора", category: "phones", price: "от 1 200 ₽", time: "20-40 мин" },
+    { id: 3, name: "Замена разъёма", category: "phones", price: "от 900 ₽", time: "20-35 мин" },
+    { id: 4, name: "Ремонт после воды", category: "phones", price: "от 2 000 ₽", time: "1-2 часа" },
+    { id: 5, name: "Прошивка", category: "phones", price: "от 800 ₽", time: "30-60 мин" },
+    { id: 6, name: "Ремонт динамика", category: "phones", price: "от 1 000 ₽", time: "20-40 мин" },
+    { id: 7, name: "Диагностика консоли", category: "consoles", price: "0 ₽", time: "20-40 мин" },
+    { id: 8, name: "Перепрошивка", category: "consoles", price: "от 2 000 ₽", time: "1-2 часа" },
+    { id: 9, name: "Ремонт дисковода", category: "consoles", price: "от 2 500 ₽", time: "1-2 часа" },
+    { id: 10, name: "Замена термопасты", category: "consoles", price: "от 1 500 ₽", time: "30-50 мин" },
+    { id: 11, name: "Ремонт геймпада", category: "consoles", price: "от 800 ₽", time: "20-40 мин" },
+    { id: 12, name: "Ремонт HDMI", category: "consoles", price: "от 2 500 ₽", time: "1-2 часа" }
+];
+
 async function loadRequests() {
     try {
         const res = await fetch('/api/requests');
@@ -37,33 +52,15 @@ function loadReviews() {
 }
 
 function loadServices() {
-    const saved = localStorage.getItem('tehno_services');
-    if (saved) {
-        allServices = JSON.parse(saved);
-    } else {
-        allServices = [
-            { id: 1, name: "Замена экрана", category: "phones", price: "от 1 500 ₽", time: "30-50 мин" },
-            { id: 2, name: "Замена аккумулятора", category: "phones", price: "от 1 200 ₽", time: "20-40 мин" },
-            { id: 3, name: "Замена разъёма", category: "phones", price: "от 900 ₽", time: "20-35 мин" },
-            { id: 4, name: "Ремонт после воды", category: "phones", price: "от 2 000 ₽", time: "1-2 часа" },
-            { id: 5, name: "Прошивка", category: "phones", price: "от 800 ₽", time: "30-60 мин" },
-            { id: 6, name: "Ремонт динамика", category: "phones", price: "от 1 000 ₽", time: "20-40 мин" },
-            { id: 7, name: "Диагностика консоли", category: "consoles", price: "0 ₽", time: "20-40 мин" },
-            { id: 8, name: "Перепрошивка", category: "consoles", price: "от 2 000 ₽", time: "1-2 часа" },
-            { id: 9, name: "Ремонт дисковода", category: "consoles", price: "от 2 500 ₽", time: "1-2 часа" },
-            { id: 10, name: "Замена термопасты", category: "consoles", price: "от 1 500 ₽", time: "30-50 мин" },
-            { id: 11, name: "Ремонт геймпада", category: "consoles", price: "от 800 ₽", time: "20-40 мин" },
-            { id: 12, name: "Ремонт HDMI", category: "consoles", price: "от 2 500 ₽", time: "1-2 часа" }
-        ];
-        localStorage.setItem('tehno_services', JSON.stringify(allServices));
-    }
+    // ПРИНУДИТЕЛЬНО ЗАГРУЖАЕМ ВСЕ УСЛУГИ
+    allServices = [...FORCED_SERVICES];
+    localStorage.setItem('tehno_services', JSON.stringify(allServices));
     renderServices();
-    document.getElementById('servicesCount').innerText = allServices.length;
 }
 
 function loadPhotos() {
     const saved = localStorage.getItem('tehno_photos');
-    if (saved) {
+    if (saved && JSON.parse(saved).length > 0) {
         allPhotos = JSON.parse(saved);
     } else {
         allPhotos = [
@@ -76,7 +73,6 @@ function loadPhotos() {
     renderPhotos();
 }
 
-// ===== СТАТИСТИКА =====
 function updateStats() {
     document.getElementById('totalCount').innerText = allRequests.length;
     document.getElementById('newCount').innerText = allRequests.filter(r => r.status === 'new').length;
@@ -102,7 +98,6 @@ function updateChart() {
     });
 }
 
-// ===== ЗАЯВКИ =====
 function renderRequests() {
     let filtered = [...allRequests];
     if(currentFilter.search) {
@@ -131,8 +126,8 @@ function renderRequests() {
                 ${r.status !== 'work' ? `<button class="action-btn action-work" onclick="updateStatus(${r.id}, 'work')">В работу</button>` : ''}
                 ${r.status !== 'done' ? `<button class="action-btn action-done" onclick="updateStatus(${r.id}, 'done')">Выполнить</button>` : ''}
                 <button class="action-btn action-delete" onclick="deleteRequest(${r.id})">Удалить</button>
-            </td>
-        </tr>
+             </td>
+         </tr>
     `).join('');
 }
 
@@ -147,7 +142,6 @@ window.deleteRequest = async (id) => {
     loadRequests();
 };
 
-// ===== ОТЗЫВЫ =====
 function renderReviews() {
     const container = document.getElementById('reviewsList');
     if(!container) return;
@@ -202,7 +196,6 @@ window.deleteReview = (id) => {
     renderReviews(); renderModeration(); updateModerationBadge();
 };
 
-// ===== УСЛУГИ =====
 function renderServices() {
     const container = document.getElementById('servicesList');
     if(!container) return;
@@ -221,7 +214,6 @@ window.deleteService = (id) => {
     renderServices();
 };
 
-// ===== ФОТО =====
 function renderPhotos() {
     const container = document.getElementById('photosList');
     if(!container) return;
@@ -274,7 +266,6 @@ function updateSitePhotos() {
     localStorage.setItem('tehno_photos_global', JSON.stringify(allPhotos));
 }
 
-// ===== НАСТРОЙКИ =====
 document.getElementById('exportDataBtn')?.addEventListener('click', () => {
     const data = { requests: allRequests, reviews: allReviews, services: allServices, photos: allPhotos };
     const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
@@ -301,7 +292,6 @@ document.getElementById('changePassBtn')?.addEventListener('click', () => {
     document.getElementById('passMsg').innerHTML = '<span style="color:#10b981">✓ Пароль изменён</span>';
 });
 
-// ===== НАВИГАЦИЯ =====
 document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', (e) => {
         e.preventDefault();
@@ -349,7 +339,7 @@ document.getElementById('exportReviewsBtn')?.addEventListener('click', () => {
 });
 document.getElementById('themeToggle')?.addEventListener('click', () => { document.body.classList.toggle('dark-theme'); });
 
-// ===== ВХОД =====
+// ВХОД
 document.getElementById('loginBtn')?.addEventListener('click', () => {
     if(document.getElementById('loginPassword').value === ADMIN_PASSWORD) {
         document.getElementById('loginOverlay').style.display = 'none';
