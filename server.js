@@ -13,7 +13,7 @@ app.use(express.static(__dirname));
 // ===== БАЗА ДАННЫХ =====
 const db = new sqlite3.Database('./database.sqlite');
 
-// Создание таблицы заявок
+// Создание таблиц
 db.run(`
   CREATE TABLE IF NOT EXISTS requests (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -28,6 +28,9 @@ db.run(`
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )
 `);
+
+// ===== ЗАЩИТА ОТ ДУБЛЕЙ (хранилище последних заявок) =====
+const lastRequestByPhone = new Map();
 
 // ===== API: ПОЛУЧИТЬ ВСЕ ЗАЯВКИ =====
 app.get('/api/requests', (req, res) => {
@@ -45,7 +48,7 @@ app.get('/api/stats', (req, res) => {
     });
 });
 
-// ===== API: СОЗДАТЬ ЗАЯВКУ (БЕЗ CSRF) =====
+// ===== API: СОЗДАТЬ ЗАЯВКУ (С ЗАЩИТОЙ ОТ ДУБЛЕЙ) =====
 app.post('/api/request', (req, res) => {
     const { type, name, phone, email, model, service, message } = req.body;
     
@@ -54,18 +57,43 @@ app.post('/api/request', (req, res) => {
         return res.status(400).json({ error: 'Имя и телефон обязательны' });
     }
     
+    // ЗАЩИТА ОТ ДУБЛЕЙ: один телефон не может отправить больше 1 заявки в 60 секунд
+    const now = Date.now();
+    const lastTime = lastRequestByPhone.get(phone);
+    
+    if (lastTime && (now - lastTime) < 60000) {
+        // Дубль в течение 60 секунд — возвращаем успех, но не сохраняем
+        console.log(`⚠️ Дубль отклонён для ${phone}, прошло ${now - lastTime}мс`);
+        return res.json({ success: true, id: null, duplicate: true });
+    }
+    
+    // Запоминаем время отправки
+    lastRequestByPhone.set(phone, now);
+    
+    // Чистим старые записи раз в час (чтобы память не росла)
+    if (lastRequestByPhone.size > 1000) {
+        const hourAgo = now - 3600000;
+        for (const [key, time] of lastRequestByPhone.entries()) {
+            if (time < hourAgo) lastRequestByPhone.delete(key);
+        }
+    }
+    
     db.run(
         `INSERT INTO requests (type, name, phone, email, model, service, message, status)
          VALUES (?, ?, ?, ?, ?, ?, ?, 'new')`,
         [type, name, phone, email || '', model || '', service || '', message || ''],
         function(err) {
-            if (err) return res.status(500).json({ error: err.message });
+            if (err) {
+                console.error('Ошибка БД:', err);
+                return res.status(500).json({ error: err.message });
+            }
+            console.log(`✅ Заявка ${this.lastID} от ${phone}`);
             res.json({ id: this.lastID, success: true });
         }
     );
 });
 
-// ===== API: ОБНОВИТЬ СТАТУС ЗАЯВКИ =====
+// ===== API: ОБНОВИТЬ СТАТУС =====
 app.put('/api/request/:id', (req, res) => {
     const { status } = req.body;
     db.run('UPDATE requests SET status = ? WHERE id = ?', [status, req.params.id], function(err) {
@@ -84,7 +112,7 @@ app.delete('/api/request/:id', (req, res) => {
 
 // Запуск сервера
 app.listen(PORT, () => {
-    console.log(`Сервер запущен: http://localhost:${PORT}`);
-    console.log(`Админ-панель: http://localhost:${PORT}/admin.html`);
-    console.log(`Пароль для входа: admin123`);
+    console.log(`✅ Сервер запущен: http://localhost:${PORT}`);
+    console.log(`📍 Админ-панель: http://localhost:${PORT}/admin.html`);
+    console.log(`🔑 Пароль: admin123`);
 });
