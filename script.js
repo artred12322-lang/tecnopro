@@ -1,8 +1,7 @@
-// script.js — полностью переписан, дубликатов заявок НЕТ
+// script.js — полностью рабочий, рейтинг работает
 (function() {
     'use strict';
     
-    // Флаг для предотвращения повторной инициализации
     if (window.__scriptInitialized) return;
     window.__scriptInitialized = true;
     
@@ -100,7 +99,7 @@
             if (e.target === modal) modal.classList.remove('active');
         });
         
-        // ===== ФОРМА ЗАПИСИ (БЕЗ ДУБЛИКАТОВ) =====
+        // ===== ФОРМА ЗАПИСИ =====
         const quickForm = document.getElementById('quickForm');
         const modalStatus = document.getElementById('modalStatus');
         
@@ -110,11 +109,7 @@
             quickForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
-                // Защита от дублирования
-                if (quickForm.hasAttribute('data-sending')) {
-                    console.log('Отправка уже идёт, игнорирую');
-                    return;
-                }
+                if (quickForm.hasAttribute('data-sending')) return;
                 quickForm.setAttribute('data-sending', 'true');
                 
                 const submitBtn = quickForm.querySelector('button[type="submit"]');
@@ -353,6 +348,59 @@
             }
         }
         
+        // ===== РЕЙТИНГ ЗВЁЗДЫ — ИСПРАВЛЕНО =====
+        function initRatingStars() {
+            const stars = document.querySelectorAll('.rating-star');
+            const ratingInput = document.getElementById('reviewRating');
+            
+            if (!stars.length || !ratingInput) {
+                console.log('Звёзды или поле рейтинга не найдены');
+                return;
+            }
+            
+            console.log('Найдено звёзд:', stars.length);
+            
+            // Устанавливаем начальное значение
+            ratingInput.value = '0';
+            
+            stars.forEach(star => {
+                // Клик по звезде
+                star.addEventListener('click', function() {
+                    const value = parseInt(this.getAttribute('data-value'));
+                    ratingInput.value = value;
+                    
+                    // Обновляем отображение звёзд
+                    stars.forEach((s, i) => {
+                        s.textContent = i < value ? '★' : '☆';
+                    });
+                    
+                    console.log('Рейтинг выбран:', value);
+                });
+                
+                // Наведение мыши
+                star.addEventListener('mouseenter', function() {
+                    const value = parseInt(this.getAttribute('data-value'));
+                    stars.forEach((s, i) => {
+                        s.textContent = i < value ? '★' : '☆';
+                    });
+                });
+            });
+            
+            // Возвращаем исходные звёзды при уходе мыши с блока
+            const ratingContainer = document.querySelector('.rating-input');
+            if (ratingContainer) {
+                ratingContainer.addEventListener('mouseleave', function() {
+                    const currentValue = parseInt(ratingInput.value) || 0;
+                    stars.forEach((s, i) => {
+                        s.textContent = i < currentValue ? '★' : '☆';
+                    });
+                });
+            }
+        }
+        
+        initRatingStars();
+        
+        // ===== ФИЛЬТРЫ ОТЗЫВОВ =====
         const filterBtns = document.querySelectorAll('.filter-btn');
         if (filterBtns.length) {
             filterBtns.forEach(btn => {
@@ -365,27 +413,7 @@
             });
         }
         
-        const ratingStars = document.querySelectorAll('.rating-star');
-        const ratingInput = document.getElementById('reviewRating');
-        
-        if (ratingStars.length && ratingInput) {
-            ratingStars.forEach(star => {
-                star.addEventListener('click', () => {
-                    const value = parseInt(star.getAttribute('data-value'));
-                    ratingInput.value = value;
-                    ratingStars.forEach((s, i) => s.textContent = i < value ? '★' : '☆');
-                });
-                star.addEventListener('mouseenter', () => {
-                    const value = parseInt(star.getAttribute('data-value'));
-                    ratingStars.forEach((s, i) => s.textContent = i < value ? '★' : '☆');
-                });
-                star.addEventListener('mouseleave', () => {
-                    const currentValue = parseInt(ratingInput.value);
-                    ratingStars.forEach((s, i) => s.textContent = i < currentValue ? '★' : '☆');
-                });
-            });
-        }
-        
+        // ===== ОТПРАВКА ОТЗЫВА =====
         const reviewForm = document.getElementById('reviewForm');
         const reviewStatus = document.getElementById('reviewStatus');
         
@@ -396,19 +424,40 @@
                 e.preventDefault();
                 
                 const name = document.getElementById('reviewName')?.value.trim();
-                const rating = parseInt(document.getElementById('reviewRating')?.value);
+                const ratingRaw = document.getElementById('reviewRating')?.value;
+                const rating = parseInt(ratingRaw);
                 const text = document.getElementById('reviewText')?.value.trim();
                 
-                if (!name || !rating || rating === 0 || !text) {
+                console.log('=== ОТПРАВКА ОТЗЫВА ===');
+                console.log('Имя:', name);
+                console.log('Рейтинг RAW:', ratingRaw);
+                console.log('Рейтинг INT:', rating);
+                console.log('Текст:', text);
+                
+                if (!name) {
                     if (reviewStatus) {
-                        reviewStatus.innerHTML = 'Заполните все поля и выберите оценку';
+                        reviewStatus.innerHTML = '❌ Введите ваше имя';
+                        reviewStatus.style.color = '#f97316';
+                    }
+                    return;
+                }
+                if (!rating || rating === 0 || isNaN(rating)) {
+                    if (reviewStatus) {
+                        reviewStatus.innerHTML = '❌ Поставьте оценку (нажмите на звёздочки 1-5)';
+                        reviewStatus.style.color = '#f97316';
+                    }
+                    return;
+                }
+                if (!text) {
+                    if (reviewStatus) {
+                        reviewStatus.innerHTML = '❌ Напишите текст отзыва';
                         reviewStatus.style.color = '#f97316';
                     }
                     return;
                 }
                 if (rating < 1 || rating > 5) {
                     if (reviewStatus) {
-                        reviewStatus.innerHTML = 'Оценка должна быть от 1 до 5';
+                        reviewStatus.innerHTML = '❌ Оценка должна быть от 1 до 5';
                         reviewStatus.style.color = '#f97316';
                     }
                     return;
@@ -428,13 +477,17 @@
                 localStorage.setItem('tehno_reviews', JSON.stringify(allReviews));
                 
                 reviewForm.reset();
-                if (ratingInput) ratingInput.value = 0;
-                if (ratingStars) ratingStars.forEach(s => s.textContent = '☆');
+                const ratingInput = document.getElementById('reviewRating');
+                if (ratingInput) ratingInput.value = '0';
+                const stars = document.querySelectorAll('.rating-star');
+                if (stars) stars.forEach(s => s.textContent = '☆');
                 if (reviewStatus) {
-                    reviewStatus.innerHTML = 'Спасибо за отзыв! Он будет опубликован после проверки.';
+                    reviewStatus.innerHTML = '✅ Спасибо за отзыв! Он будет опубликован после проверки.';
                     reviewStatus.style.color = '#10b981';
                     setTimeout(() => { if (reviewStatus) reviewStatus.innerHTML = ''; }, 3000);
                 }
+                
+                renderMarquee();
             });
         }
         
