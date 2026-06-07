@@ -1,23 +1,21 @@
-// script.js — полностью рабочий, рейтинг работает
+// script.js — полная версия для PHP
 (function() {
     'use strict';
     
-    if (window.__scriptInitialized) return;
-    window.__scriptInitialized = true;
+    if (window.__finalVersionReady) return;
+    window.__finalVersionReady = true;
     
     document.addEventListener('DOMContentLoaded', () => {
         console.log('Технопро: инициализация');
         
         // ===== СЛАЙДЕР =====
-        function initSlider() {
-            let currentSlide = 0;
-            const slides = document.querySelectorAll('.slider-slide');
-            const dots = document.querySelectorAll('.slider-dots .dot');
-            const prevBtn = document.querySelector('.slider-prev');
-            const nextBtn = document.querySelector('.slider-next');
-            
-            if (!slides.length) return;
-            
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slider-slide');
+        const dots = document.querySelectorAll('.slider-dots .dot');
+        const prevBtn = document.querySelector('.slider-prev');
+        const nextBtn = document.querySelector('.slider-next');
+        
+        if (slides.length) {
             function showSlide(n) {
                 slides.forEach(s => s.classList.remove('active'));
                 dots.forEach(d => d.classList.remove('active'));
@@ -26,26 +24,19 @@
                 if (dots[idx]) dots[idx].classList.add('active');
                 currentSlide = idx;
             }
-            
             function nextSlide() { showSlide(currentSlide + 1); }
             function prevSlide() { showSlide(currentSlide - 1); }
-            
             if (prevBtn) prevBtn.addEventListener('click', prevSlide);
             if (nextBtn) nextBtn.addEventListener('click', nextSlide);
             dots.forEach((dot, i) => dot.addEventListener('click', () => showSlide(i)));
-            
             setInterval(nextSlide, 5000);
         }
-        initSlider();
         
-        // ===== ТАБЫ УСЛУГ =====
-        function initTabs() {
-            const tabBtns = document.querySelectorAll('.tab-btn');
-            const phonesGrid = document.getElementById('phones-grid');
-            const consolesGrid = document.getElementById('consoles-grid');
-            
-            if (!tabBtns.length) return;
-            
+        // ===== ТАБЫ =====
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const phonesGrid = document.getElementById('phones-grid');
+        const consolesGrid = document.getElementById('consoles-grid');
+        if (tabBtns.length) {
             tabBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
                     tabBtns.forEach(b => b.classList.remove('active'));
@@ -60,9 +51,8 @@
                 });
             });
         }
-        initTabs();
         
-        // ===== МОДАЛЬНОЕ ОКНО =====
+        // ===== МОДАЛКА =====
         const modal = document.getElementById('serviceModal');
         const closeModal = document.getElementById('closeModalBtn');
         const modalServiceSelect = document.getElementById('modalService');
@@ -89,29 +79,19 @@
                 if (modal) modal.classList.add('active');
             });
         }
+        if (closeModal) closeModal.addEventListener('click', () => modal.classList.remove('active'));
+        window.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
         
-        if (closeModal) {
-            closeModal.addEventListener('click', () => {
-                if (modal) modal.classList.remove('active');
-            });
-        }
-        window.addEventListener('click', (e) => {
-            if (e.target === modal) modal.classList.remove('active');
-        });
-        
-        // ===== ФОРМА ЗАПИСИ =====
+        // ===== ЗАПИСЬ (PHP версия) =====
         const quickForm = document.getElementById('quickForm');
         const modalStatus = document.getElementById('modalStatus');
         
-        if (quickForm && !quickForm.hasAttribute('data-listener')) {
-            quickForm.setAttribute('data-listener', 'true');
-            
+        if (quickForm && !quickForm.hasAttribute('data-fixed')) {
+            quickForm.setAttribute('data-fixed', 'true');
             quickForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                
-                if (quickForm.hasAttribute('data-sending')) return;
+                if (quickForm.getAttribute('data-sending') === 'true') return;
                 quickForm.setAttribute('data-sending', 'true');
-                
                 const submitBtn = quickForm.querySelector('button[type="submit"]');
                 if (submitBtn) submitBtn.disabled = true;
                 
@@ -141,27 +121,21 @@
                     return;
                 }
                 
-                if (modalStatus) {
-                    modalStatus.innerHTML = 'Отправка...';
-                    modalStatus.style.color = '#94a3b8';
-                }
+                if (modalStatus) modalStatus.innerHTML = 'Отправка...';
                 
                 try {
-                    const response = await fetch('/api/request', {
+                    // PHP путь
+                    const response = await fetch('/server.php/api/request', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             type: 'repair',
-                            name: name,
-                            phone: phone,
-                            model: model || '',
-                            service: service,
+                            name, phone, model: model || '',
+                            service,
                             message: (time ? 'Время: ' + time + '\n' : '') + (comment || '')
                         })
                     });
-                    
                     const data = await response.json();
-                    
                     if (data.success) {
                         if (modalStatus) {
                             modalStatus.innerHTML = '✅ Заявка принята! Мы перезвоним.';
@@ -173,11 +147,9 @@
                             if (modal) modal.classList.remove('active');
                             if (modalStatus) modalStatus.innerHTML = '';
                         }, 2000);
-                    } else {
-                        throw new Error(data.error || 'Ошибка сервера');
-                    }
+                    } else throw new Error(data.error || 'Ошибка сервера');
                 } catch (err) {
-                    console.error('Ошибка отправки:', err);
+                    console.error('Ошибка:', err);
                     if (modalStatus) {
                         modalStatus.innerHTML = '❌ Ошибка. Попробуйте позже.';
                         modalStatus.style.color = '#f97316';
@@ -189,94 +161,85 @@
             });
         }
         
-        // ===== БИЗНЕС-ПАНЕЛЬ =====
-        const businessPanel = document.getElementById('businessPanel');
-        const businessNavLink = document.getElementById('businessNavLink');
-        const footerBusinessLink = document.getElementById('footerBusinessLink');
-        const closePanelBtn = document.getElementById('closePanelBtn');
-        
-        function openBusinessPanel() {
-            if (businessPanel) businessPanel.classList.add('active');
-        }
-        function closeBusinessPanel() {
-            if (businessPanel) businessPanel.classList.remove('active');
-        }
-        
-        if (businessNavLink) businessNavLink.addEventListener('click', (e) => { e.preventDefault(); openBusinessPanel(); });
-        if (footerBusinessLink) footerBusinessLink.addEventListener('click', (e) => { e.preventDefault(); openBusinessPanel(); });
-        if (closePanelBtn) closePanelBtn.addEventListener('click', closeBusinessPanel);
-        
-        // ===== БИЗНЕС-ФОРМА =====
+        // ===== БИЗНЕС =====
         const businessForm = document.getElementById('businessForm');
         const businessStatus = document.getElementById('businessStatus');
         
-        if (businessForm && !businessForm.hasAttribute('data-listener')) {
-            businessForm.setAttribute('data-listener', 'true');
-            
+        if (businessForm && !businessForm.hasAttribute('data-fixed')) {
+            businessForm.setAttribute('data-fixed', 'true');
             businessForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                
-                if (businessForm.hasAttribute('data-sending')) return;
+                if (businessForm.getAttribute('data-sending') === 'true') return;
                 businessForm.setAttribute('data-sending', 'true');
-                
-                const submitBtn = businessForm.querySelector('button[type="submit"]');
-                if (submitBtn) submitBtn.disabled = true;
-                
                 const name = document.getElementById('businessName')?.value.trim();
                 const phone = document.getElementById('businessPhone')?.value.trim();
                 const email = document.getElementById('businessEmail')?.value.trim();
-                
                 if (!name || !phone) {
-                    if (businessStatus) {
-                        businessStatus.innerHTML = 'Заполните компанию и телефон';
-                        businessStatus.style.color = '#f97316';
-                    }
+                    if (businessStatus) businessStatus.innerHTML = 'Заполните компанию и телефон';
                     businessForm.removeAttribute('data-sending');
-                    if (submitBtn) submitBtn.disabled = false;
                     return;
                 }
-                
                 if (businessStatus) businessStatus.innerHTML = 'Отправка...';
-                
                 try {
-                    const response = await fetch('/api/request', {
+                    // PHP путь
+                    const response = await fetch('/server.php/api/request', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            type: 'business',
-                            name: name,
-                            phone: phone,
-                            email: email || '',
-                            service: 'Рекламный контракт'
-                        })
+                        body: JSON.stringify({ type: 'business', name, phone, email: email || '', service: 'Рекламный контракт' })
                     });
-                    
                     const data = await response.json();
-                    
                     if (data.success) {
                         if (businessStatus) {
                             businessStatus.innerHTML = '✅ Заявка отправлена! Менеджер свяжется.';
                             businessStatus.style.color = '#10b981';
                         }
                         businessForm.reset();
-                        setTimeout(() => closeBusinessPanel(), 2000);
-                    } else {
-                        throw new Error(data.error || 'Ошибка сервера');
-                    }
-                } catch (err) {
-                    console.error('Ошибка:', err);
-                    if (businessStatus) {
-                        businessStatus.innerHTML = '❌ Ошибка. Попробуйте позже.';
-                        businessStatus.style.color = '#f97316';
-                    }
+                        setTimeout(() => document.getElementById('businessPanel')?.classList.remove('active'), 2000);
+                    } else throw new Error();
+                } catch {
+                    if (businessStatus) businessStatus.innerHTML = '❌ Ошибка. Попробуйте позже.';
                 } finally {
                     businessForm.removeAttribute('data-sending');
-                    if (submitBtn) submitBtn.disabled = false;
                 }
             });
         }
         
+        // ===== БИЗНЕС-ПАНЕЛЬ =====
+        const businessPanel = document.getElementById('businessPanel');
+        const businessNavLink = document.getElementById('businessNavLink');
+        const footerBusinessLink = document.getElementById('footerBusinessLink');
+        const closePanelBtn = document.getElementById('closePanelBtn');
+        
+        function openBusinessPanel() { if (businessPanel) businessPanel.classList.add('active'); }
+        function closeBusinessPanel() { if (businessPanel) businessPanel.classList.remove('active'); }
+        
+        if (businessNavLink) businessNavLink.addEventListener('click', (e) => { e.preventDefault(); openBusinessPanel(); });
+        if (footerBusinessLink) footerBusinessLink.addEventListener('click', (e) => { e.preventDefault(); openBusinessPanel(); });
+        if (closePanelBtn) closePanelBtn.addEventListener('click', closeBusinessPanel);
+        
         // ===== ОТЗЫВЫ =====
+        function showInlineMessage(message, isSuccess = true) {
+            let msgDiv = document.getElementById('reviewInlineMessage');
+            if (!msgDiv) {
+                msgDiv = document.createElement('div');
+                msgDiv.id = 'reviewInlineMessage';
+                const addReviewDiv = document.querySelector('.add-review');
+                if (addReviewDiv) addReviewDiv.appendChild(msgDiv);
+            }
+            msgDiv.className = `review-inline-message ${isSuccess ? 'success' : 'error'}`;
+            msgDiv.innerHTML = `<i class="fas ${isSuccess ? 'fa-check-circle' : 'fa-exclamation-triangle'}"></i> <span>${message}</span>`;
+            msgDiv.style.display = 'flex';
+            setTimeout(() => {
+                msgDiv.style.opacity = '0';
+                setTimeout(() => {
+                    if (msgDiv) {
+                        msgDiv.style.display = 'none';
+                        msgDiv.style.opacity = '1';
+                    }
+                }, 300);
+            }, 4000);
+        }
+        
         let allReviews = JSON.parse(localStorage.getItem('tehno_reviews') || '[]');
         let currentFilter = 'all';
         
@@ -296,8 +259,7 @@
         }
         
         function getAvatar(name) {
-            const initials = name.charAt(0).toUpperCase();
-            return `<div class="review-avatar">${initials}</div>`;
+            return `<div class="review-avatar">${name.charAt(0).toUpperCase()}</div>`;
         }
         
         function getFilteredReviews() {
@@ -340,7 +302,6 @@
                     ` : ''}
                 </div>
             `).join('');
-            
             const marquee = document.querySelector('.reviews-marquee');
             if (marquee) {
                 marquee.style.animation = 'none';
@@ -348,59 +309,37 @@
             }
         }
         
-        // ===== РЕЙТИНГ ЗВЁЗДЫ — ИСПРАВЛЕНО =====
         function initRatingStars() {
             const stars = document.querySelectorAll('.rating-star');
             const ratingInput = document.getElementById('reviewRating');
-            
-            if (!stars.length || !ratingInput) {
-                console.log('Звёзды или поле рейтинга не найдены');
-                return;
-            }
-            
-            console.log('Найдено звёзд:', stars.length);
-            
-            // Устанавливаем начальное значение
+            if (!stars.length || !ratingInput) return;
             ratingInput.value = '0';
-            
             stars.forEach(star => {
-                // Клик по звезде
-                star.addEventListener('click', function() {
-                    const value = parseInt(this.getAttribute('data-value'));
-                    ratingInput.value = value;
-                    
-                    // Обновляем отображение звёзд
-                    stars.forEach((s, i) => {
-                        s.textContent = i < value ? '★' : '☆';
-                    });
-                    
-                    console.log('Рейтинг выбран:', value);
-                });
-                
-                // Наведение мыши
-                star.addEventListener('mouseenter', function() {
-                    const value = parseInt(this.getAttribute('data-value'));
-                    stars.forEach((s, i) => {
-                        s.textContent = i < value ? '★' : '☆';
-                    });
-                });
+                star.removeEventListener('click', star._click);
+                star.removeEventListener('mouseenter', star._enter);
+                const val = parseInt(star.getAttribute('data-value'));
+                star._click = () => {
+                    ratingInput.value = val;
+                    stars.forEach((s, i) => s.textContent = i < val ? '★' : '☆');
+                };
+                star._enter = () => {
+                    stars.forEach((s, i) => s.textContent = i < val ? '★' : '☆');
+                };
+                star.addEventListener('click', star._click);
+                star.addEventListener('mouseenter', star._enter);
             });
-            
-            // Возвращаем исходные звёзды при уходе мыши с блока
-            const ratingContainer = document.querySelector('.rating-input');
-            if (ratingContainer) {
-                ratingContainer.addEventListener('mouseleave', function() {
-                    const currentValue = parseInt(ratingInput.value) || 0;
-                    stars.forEach((s, i) => {
-                        s.textContent = i < currentValue ? '★' : '☆';
-                    });
-                });
+            const container = document.querySelector('.rating-input');
+            if (container) {
+                container.removeEventListener('mouseleave', container._leave);
+                container._leave = () => {
+                    const cur = parseInt(ratingInput.value) || 0;
+                    stars.forEach((s, i) => s.textContent = i < cur ? '★' : '☆');
+                };
+                container.addEventListener('mouseleave', container._leave);
             }
         }
-        
         initRatingStars();
         
-        // ===== ФИЛЬТРЫ ОТЗЫВОВ =====
         const filterBtns = document.querySelectorAll('.filter-btn');
         if (filterBtns.length) {
             filterBtns.forEach(btn => {
@@ -413,57 +352,25 @@
             });
         }
         
-        // ===== ОТПРАВКА ОТЗЫВА =====
-        const reviewForm = document.getElementById('reviewForm');
-        const reviewStatus = document.getElementById('reviewStatus');
-        
-        if (reviewForm && !reviewForm.hasAttribute('data-listener')) {
-            reviewForm.setAttribute('data-listener', 'true');
+        const oldReviewForm = document.getElementById('reviewForm');
+        if (oldReviewForm && !oldReviewForm.hasAttribute('data-final')) {
+            const newReviewForm = oldReviewForm.cloneNode(true);
+            oldReviewForm.parentNode.replaceChild(newReviewForm, oldReviewForm);
+            newReviewForm.setAttribute('data-final', 'true');
             
-            reviewForm.addEventListener('submit', (e) => {
+            newReviewForm.addEventListener('submit', (e) => {
                 e.preventDefault();
-                
                 const name = document.getElementById('reviewName')?.value.trim();
                 const ratingRaw = document.getElementById('reviewRating')?.value;
                 const rating = parseInt(ratingRaw);
                 const text = document.getElementById('reviewText')?.value.trim();
                 
-                console.log('=== ОТПРАВКА ОТЗЫВА ===');
-                console.log('Имя:', name);
-                console.log('Рейтинг RAW:', ratingRaw);
-                console.log('Рейтинг INT:', rating);
-                console.log('Текст:', text);
+                if (!name) { showInlineMessage('❌ Введите ваше имя', false); return; }
+                if (!rating || rating === 0 || isNaN(rating)) { showInlineMessage('⭐ Поставьте оценку (нажмите на звёздочки)', false); return; }
+                if (!text) { showInlineMessage('📝 Напишите текст отзыва', false); return; }
                 
-                if (!name) {
-                    if (reviewStatus) {
-                        reviewStatus.innerHTML = '❌ Введите ваше имя';
-                        reviewStatus.style.color = '#f97316';
-                    }
-                    return;
-                }
-                if (!rating || rating === 0 || isNaN(rating)) {
-                    if (reviewStatus) {
-                        reviewStatus.innerHTML = '❌ Поставьте оценку (нажмите на звёздочки 1-5)';
-                        reviewStatus.style.color = '#f97316';
-                    }
-                    return;
-                }
-                if (!text) {
-                    if (reviewStatus) {
-                        reviewStatus.innerHTML = '❌ Напишите текст отзыва';
-                        reviewStatus.style.color = '#f97316';
-                    }
-                    return;
-                }
-                if (rating < 1 || rating > 5) {
-                    if (reviewStatus) {
-                        reviewStatus.innerHTML = '❌ Оценка должна быть от 1 до 5';
-                        reviewStatus.style.color = '#f97316';
-                    }
-                    return;
-                }
-                
-                const newReview = {
+                let reviews = JSON.parse(localStorage.getItem('tehno_reviews') || '[]');
+                reviews.push({
                     id: Date.now(),
                     name: name,
                     rating: rating,
@@ -471,23 +378,13 @@
                     date: new Date().toLocaleDateString('ru-RU'),
                     status: 'pending',
                     adminReply: ""
-                };
-                
-                allReviews.push(newReview);
-                localStorage.setItem('tehno_reviews', JSON.stringify(allReviews));
-                
-                reviewForm.reset();
-                const ratingInput = document.getElementById('reviewRating');
-                if (ratingInput) ratingInput.value = '0';
-                const stars = document.querySelectorAll('.rating-star');
-                if (stars) stars.forEach(s => s.textContent = '☆');
-                if (reviewStatus) {
-                    reviewStatus.innerHTML = '✅ Спасибо за отзыв! Он будет опубликован после проверки.';
-                    reviewStatus.style.color = '#10b981';
-                    setTimeout(() => { if (reviewStatus) reviewStatus.innerHTML = ''; }, 3000);
-                }
-                
-                renderMarquee();
+                });
+                localStorage.setItem('tehno_reviews', JSON.stringify(reviews));
+                showInlineMessage('✅ Спасибо! Отзыв отправлен на модерацию', true);
+                newReviewForm.reset();
+                document.getElementById('reviewRating').value = '0';
+                document.querySelectorAll('.rating-star').forEach(s => s.textContent = '☆');
+                setTimeout(() => renderMarquee(), 500);
             });
         }
         
@@ -497,7 +394,6 @@
         let clickCount = 0;
         let clickTimer = null;
         const adminLogo = document.getElementById('adminLogoTrigger');
-        
         if (adminLogo) {
             adminLogo.addEventListener('click', () => {
                 clickCount++;
@@ -518,7 +414,6 @@
                 const officePhoto = photos.find(p => p.category === 'office');
                 const teamPhoto = photos.find(p => p.category === 'team');
                 const repairPhotos = photos.filter(p => p.category === 'repair');
-                
                 const slidesElements = document.querySelectorAll('.slider-slide');
                 if (slidesElements.length >= 1 && officePhoto) {
                     const img = slidesElements[0].querySelector('img');
@@ -539,19 +434,56 @@
             }
         }
         loadPhotosFromAdmin();
-        
         window.addEventListener('storage', (e) => {
             if (e.key === 'tehno_photos_global') loadPhotosFromAdmin();
         });
         
+        // ===== МОБИЛЬНОЕ МЕНЮ =====
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileMenuClose = document.getElementById('mobileMenuClose');
+        const mobileOverlay = document.getElementById('mobileOverlay');
+        const mobileBusinessLink = document.getElementById('mobileBusinessLink');
+        
+        function openMobileMenu() {
+            if (mobileMenu) mobileMenu.classList.add('open');
+            if (mobileOverlay) mobileOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeMobileMenu() {
+            if (mobileMenu) mobileMenu.classList.remove('open');
+            if (mobileOverlay) mobileOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', openMobileMenu);
+        if (mobileMenuClose) mobileMenuClose.addEventListener('click', closeMobileMenu);
+        if (mobileOverlay) mobileOverlay.addEventListener('click', closeMobileMenu);
+        
+        document.querySelectorAll('.mobile-nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                closeMobileMenu();
+            });
+        });
+        
+        if (mobileBusinessLink) {
+            mobileBusinessLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                closeMobileMenu();
+                setTimeout(() => {
+                    if (businessPanel) businessPanel.classList.add('active');
+                }, 300);
+            });
+        }
+        
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 900) closeMobileMenu();
+        });
+        
         function escapeHtml(str) {
             if (!str) return '';
-            return str.replace(/[&<>]/g, m => {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                return m;
-            });
+            return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[m]);
         }
         
         console.log('Технопро: инициализация завершена');
