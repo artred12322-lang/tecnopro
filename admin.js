@@ -8,7 +8,6 @@ let itemsPerPage = 15;
 let currentFilter = { search: '', type: 'all', status: 'all' };
 let currentChart = null;
 
-// ПРИНУДИТЕЛЬНЫЙ СПИСОК ВСЕХ УСЛУГ
 const FORCED_SERVICES = [
     { id: 1, name: "Замена экрана", category: "phones", price: "от 1 500 ₽", time: "30-50 мин" },
     { id: 2, name: "Замена аккумулятора", category: "phones", price: "от 1 200 ₽", time: "20-40 мин" },
@@ -26,7 +25,7 @@ const FORCED_SERVICES = [
 
 async function loadRequests() {
     try {
-        const res = await fetch('/api/requests');
+        const res = await fetch('/server.php/api/requests');
         allRequests = await res.json();
         updateStats();
         updateChart();
@@ -52,10 +51,14 @@ function loadReviews() {
 }
 
 function loadServices() {
-    // ПРИНУДИТЕЛЬНО ЗАГРУЖАЕМ ВСЕ УСЛУГИ
     allServices = [...FORCED_SERVICES];
     localStorage.setItem('tehno_services', JSON.stringify(allServices));
     renderServices();
+}
+
+function syncPhotosToSite() {
+    localStorage.setItem('tehno_photos_global', JSON.stringify(allPhotos));
+    console.log('✅ Фото синхронизированы с сайтом:', allPhotos.length);
 }
 
 function loadPhotos() {
@@ -70,6 +73,7 @@ function loadPhotos() {
         ];
         localStorage.setItem('tehno_photos', JSON.stringify(allPhotos));
     }
+    syncPhotosToSite();
     renderPhotos();
 }
 
@@ -94,7 +98,16 @@ function updateChart() {
     if(currentChart) currentChart.destroy();
     currentChart = new Chart(ctx, {
         type: 'line',
-        data: { labels: Array.from({length:30},(_,i)=>i+1), datasets: [{ label: 'Заявки', data: counts, borderColor: '#00a8ff', fill: true, backgroundColor: 'rgba(0,168,255,0.1)' }] }
+        data: { 
+            labels: Array.from({length:30},(_,i)=>i+1), 
+            datasets: [{ 
+                label: 'Заявки', 
+                data: counts, 
+                borderColor: '#00a8ff', 
+                fill: true, 
+                backgroundColor: 'rgba(0,168,255,0.1)' 
+            }]
+        }
     });
 }
 
@@ -108,16 +121,29 @@ function renderRequests() {
     }
     if(currentFilter.type !== 'all') filtered = filtered.filter(r => r.type === currentFilter.type);
     if(currentFilter.status !== 'all') filtered = filtered.filter(r => r.status === currentFilter.status);
+    
     const total = Math.ceil(filtered.length / itemsPerPage);
     const start = (currentPage-1)*itemsPerPage;
     const page = filtered.slice(start, start+itemsPerPage);
+    
     document.getElementById('pageInfo').innerText = `${currentPage}/${total||1}`;
     const tbody = document.getElementById('requestsBody');
-    if(!page.length) { tbody.innerHTML = '<tr><td colspan="7">Нет заявок</td></tr>'; return; }
-    tbody.innerHTML = page.map(r => `
+    
+    if(!page.length) { 
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center">Нет заявок</td></tr>'; 
+        return; 
+    }
+    
+    tbody.innerHTML = page.map(r => {
+        let dateStr = '';
+        if (r.created_at) {
+            const date = new Date(r.created_at);
+            dateStr = `${date.toLocaleDateString('ru-RU')} ${date.toLocaleTimeString('ru-RU')}`;
+        }
+        return `
         <tr>
             <td>${r.id}</td>
-            <td>${new Date(r.created_at).toLocaleString()}</td>
+            <td>${dateStr}</td>
             <td>${escapeHtml(r.name)}</td>
             <td>${escapeHtml(r.phone)}</td>
             <td>${escapeHtml(r.service || r.type)}</td>
@@ -126,19 +152,20 @@ function renderRequests() {
                 ${r.status !== 'work' ? `<button class="action-btn action-work" onclick="updateStatus(${r.id}, 'work')">В работу</button>` : ''}
                 ${r.status !== 'done' ? `<button class="action-btn action-done" onclick="updateStatus(${r.id}, 'done')">Выполнить</button>` : ''}
                 <button class="action-btn action-delete" onclick="deleteRequest(${r.id})">Удалить</button>
-             </td>
+              </td>
          </tr>
-    `).join('');
+        `;
+    }).join('');
 }
 
 window.updateStatus = async (id, status) => {
-    await fetch(`/api/request/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({status}) });
+    await fetch(`/server.php/api/request/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({status}) });
     loadRequests();
 };
 
 window.deleteRequest = async (id) => {
     if(!confirm('Удалить заявку?')) return;
-    await fetch(`/api/request/${id}`, { method: 'DELETE' });
+    await fetch(`/server.php/api/request/${id}`, { method: 'DELETE' });
     loadRequests();
 };
 
@@ -146,13 +173,21 @@ function renderReviews() {
     const container = document.getElementById('reviewsList');
     if(!container) return;
     const approved = allReviews.filter(r => r.status === 'approved');
-    if(approved.length === 0) { container.innerHTML = '<div>Нет отзывов</div>'; return; }
+    if(approved.length === 0) { 
+        container.innerHTML = '<div class="text-center">Нет одобренных отзывов</div>'; 
+        return; 
+    }
     container.innerHTML = approved.map(r => `
         <div class="review-card">
-            <div class="review-header"><strong>${escapeHtml(r.name)}</strong> <span class="review-rating">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span></div>
+            <div class="review-header">
+                <strong>${escapeHtml(r.name)}</strong> 
+                <span class="review-rating">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span>
+            </div>
             <div class="review-text">${escapeHtml(r.text)}</div>
             <div class="review-date">${r.date}</div>
-            <div class="review-actions"><button onclick="deleteReview(${r.id})" class="btn-delete">Удалить</button></div>
+            <div class="review-actions">
+                <button onclick="deleteReview(${r.id})" class="btn-delete">Удалить</button>
+            </div>
         </div>
     `).join('');
 }
@@ -161,13 +196,22 @@ function renderModeration() {
     const container = document.getElementById('moderationList');
     if(!container) return;
     const pending = allReviews.filter(r => r.status === 'pending');
-    if(pending.length === 0) { container.innerHTML = '<div>Нет отзывов на модерации</div>'; return; }
+    if(pending.length === 0) { 
+        container.innerHTML = '<div class="text-center">Нет отзывов на модерации</div>'; 
+        return; 
+    }
     container.innerHTML = pending.map(r => `
         <div class="review-card">
-            <div class="review-header"><strong>${escapeHtml(r.name)}</strong> <span class="review-rating">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span></div>
+            <div class="review-header">
+                <strong>${escapeHtml(r.name)}</strong> 
+                <span class="review-rating">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span>
+            </div>
             <div class="review-text">${escapeHtml(r.text)}</div>
             <div class="review-date">${r.date}</div>
-            <div class="review-actions"><button onclick="approveReview(${r.id})" class="btn-approve">Одобрить</button> <button onclick="rejectReview(${r.id})" class="btn-reject">Отклонить</button></div>
+            <div class="review-actions">
+                <button onclick="approveReview(${r.id})" class="btn-approve">Одобрить</button>
+                <button onclick="rejectReview(${r.id})" class="btn-reject">Отклонить</button>
+            </div>
         </div>
     `).join('');
 }
@@ -183,27 +227,47 @@ function updateModerationBadge() {
 
 window.approveReview = (id) => {
     const idx = allReviews.findIndex(r => r.id === id);
-    if(idx !== -1) { allReviews[idx].status = 'approved'; localStorage.setItem('tehno_reviews', JSON.stringify(allReviews)); renderReviews(); renderModeration(); updateModerationBadge(); }
+    if(idx !== -1) { 
+        allReviews[idx].status = 'approved'; 
+        localStorage.setItem('tehno_reviews', JSON.stringify(allReviews)); 
+        renderReviews(); 
+        renderModeration(); 
+        updateModerationBadge(); 
+    }
 };
+
 window.rejectReview = (id) => {
     allReviews = allReviews.filter(r => r.id !== id);
     localStorage.setItem('tehno_reviews', JSON.stringify(allReviews));
-    renderReviews(); renderModeration(); updateModerationBadge();
+    renderReviews(); 
+    renderModeration(); 
+    updateModerationBadge();
 };
+
 window.deleteReview = (id) => {
     allReviews = allReviews.filter(r => r.id !== id);
     localStorage.setItem('tehno_reviews', JSON.stringify(allReviews));
-    renderReviews(); renderModeration(); updateModerationBadge();
+    renderReviews(); 
+    renderModeration(); 
+    updateModerationBadge();
 };
 
 function renderServices() {
     const container = document.getElementById('servicesList');
     if(!container) return;
-    if(allServices.length === 0) { container.innerHTML = '<div>Нет услуг</div>'; return; }
+    if(allServices.length === 0) { 
+        container.innerHTML = '<div class="text-center">Нет услуг</div>'; 
+        return; 
+    }
     container.innerHTML = allServices.map(s => `
         <div class="service-card">
-            <div><strong>${escapeHtml(s.name)}</strong> <span style="color:#00a8ff">${s.price}</span> | ${s.time}</div>
-            <div class="service-actions"><button onclick="deleteService(${s.id})" class="btn-delete">Удалить</button></div>
+            <div>
+                <strong>${escapeHtml(s.name)}</strong> 
+                <span style="color:#00a8ff">${s.price}</span> | ${s.time}
+            </div>
+            <div class="service-actions">
+                <button onclick="deleteService(${s.id})" class="btn-delete">Удалить</button>
+            </div>
         </div>
     `).join('');
 }
@@ -217,7 +281,10 @@ window.deleteService = (id) => {
 function renderPhotos() {
     const container = document.getElementById('photosList');
     if(!container) return;
-    if(allPhotos.length === 0) { container.innerHTML = '<div>Нет фото</div>'; return; }
+    if(allPhotos.length === 0) { 
+        container.innerHTML = '<div class="text-center">Нет фото</div>'; 
+        return; 
+    }
     container.innerHTML = `
         <div class="photos-grid">
             ${allPhotos.map(p => `
@@ -225,6 +292,7 @@ function renderPhotos() {
                     <img src="${p.url}" onerror="this.src='https://placehold.co/200x150/1e3a5f/white?text=No+Image'">
                     <div class="photo-info">
                         <div class="photo-title">${escapeHtml(p.title)}</div>
+                        <div class="photo-category" style="font-size: 11px; color: #00a8ff;">${p.category}</div>
                     </div>
                     <button class="photo-delete" onclick="deletePhoto(${p.id})"><i class="fas fa-trash"></i></button>
                 </div>
@@ -238,6 +306,7 @@ function renderPhotos() {
 }
 
 let currentUploadCategory = 'office';
+
 document.getElementById('photoInput')?.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if(!file) return;
@@ -247,8 +316,8 @@ document.getElementById('photoInput')?.addEventListener('change', (e) => {
         const newId = Date.now();
         allPhotos.push({ id: newId, name: file.name, url: ev.target.result, category: currentUploadCategory, title: title });
         localStorage.setItem('tehno_photos', JSON.stringify(allPhotos));
+        syncPhotosToSite();
         renderPhotos();
-        updateSitePhotos();
     };
     reader.readAsDataURL(file);
     e.target.value = '';
@@ -258,13 +327,19 @@ window.deletePhoto = (id) => {
     if(!confirm('Удалить фото?')) return;
     allPhotos = allPhotos.filter(p => p.id !== id);
     localStorage.setItem('tehno_photos', JSON.stringify(allPhotos));
+    syncPhotosToSite();
     renderPhotos();
-    updateSitePhotos();
 };
 
-function updateSitePhotos() {
-    localStorage.setItem('tehno_photos_global', JSON.stringify(allPhotos));
-}
+document.getElementById('uploadPhotoBtn')?.addEventListener('click', () => {
+    const category = prompt('Выберите категорию фото:\n- office (офис)\n- team (команда)\n- repair (ремонт)', 'office');
+    if (category && ['office', 'team', 'repair'].includes(category.toLowerCase())) {
+        currentUploadCategory = category.toLowerCase();
+        document.getElementById('photoInput').click();
+    } else if (category) {
+        alert('Категория должна быть: office, team или repair');
+    }
+});
 
 document.getElementById('exportDataBtn')?.addEventListener('click', () => {
     const data = { requests: allRequests, reviews: allReviews, services: allServices, photos: allPhotos };
@@ -275,21 +350,39 @@ document.getElementById('exportDataBtn')?.addEventListener('click', () => {
     link.click();
 });
 
+document.getElementById('syncPhotosBtn')?.addEventListener('click', () => {
+    syncPhotosToSite();
+    alert('Фото синхронизированы с сайтом!');
+});
+
 document.getElementById('clearDataBtn')?.addEventListener('click', () => {
     if(confirm('Очистить ВСЕ отзывы, услуги и фото?')) {
         localStorage.removeItem('tehno_reviews');
         localStorage.removeItem('tehno_services');
         localStorage.removeItem('tehno_photos');
-        loadReviews(); loadServices(); loadPhotos();
+        localStorage.removeItem('tehno_photos_global');
+        loadReviews(); 
+        loadServices(); 
+        loadPhotos();
+        alert('Данные очищены');
     }
 });
 
 document.getElementById('changePassBtn')?.addEventListener('click', () => {
     const p1 = document.getElementById('newPass').value;
     const p2 = document.getElementById('newPassConfirm').value;
-    if(p1 !== p2) { document.getElementById('passMsg').innerText = 'Пароли не совпадают'; return; }
-    if(p1.length < 6) { document.getElementById('passMsg').innerText = 'Минимум 6 символов'; return; }
+    if(p1 !== p2) { 
+        document.getElementById('passMsg').innerText = 'Пароли не совпадают'; 
+        return; 
+    }
+    if(p1.length < 6) { 
+        document.getElementById('passMsg').innerText = 'Минимум 6 символов'; 
+        return; 
+    }
     document.getElementById('passMsg').innerHTML = '<span style="color:#10b981">✓ Пароль изменён</span>';
+    setTimeout(() => {
+        document.getElementById('passMsg').innerHTML = '';
+    }, 3000);
 });
 
 document.querySelectorAll('.nav-item').forEach(item => {
@@ -309,9 +402,24 @@ document.querySelectorAll('.nav-item').forEach(item => {
     });
 });
 
-document.getElementById('searchInput')?.addEventListener('input', (e) => { currentFilter.search = e.target.value.toLowerCase(); currentPage=1; renderRequests(); });
-document.getElementById('typeFilter')?.addEventListener('change', (e) => { currentFilter.type = e.target.value; currentPage=1; renderRequests(); });
-document.getElementById('statusFilter')?.addEventListener('change', (e) => { currentFilter.status = e.target.value; currentPage=1; renderRequests(); });
+document.getElementById('searchInput')?.addEventListener('input', (e) => { 
+    currentFilter.search = e.target.value.toLowerCase(); 
+    currentPage = 1; 
+    renderRequests(); 
+});
+
+document.getElementById('typeFilter')?.addEventListener('change', (e) => { 
+    currentFilter.type = e.target.value; 
+    currentPage = 1; 
+    renderRequests(); 
+});
+
+document.getElementById('statusFilter')?.addEventListener('change', (e) => { 
+    currentFilter.status = e.target.value; 
+    currentPage = 1; 
+    renderRequests(); 
+});
+
 document.getElementById('resetFilters')?.addEventListener('click', () => {
     document.getElementById('searchInput').value = '';
     document.getElementById('typeFilter').value = 'all';
@@ -320,37 +428,65 @@ document.getElementById('resetFilters')?.addEventListener('click', () => {
     currentPage = 1;
     renderRequests();
 });
-document.getElementById('prevPage')?.addEventListener('click', () => { if(currentPage>1){currentPage--; renderRequests();} });
-document.getElementById('nextPage')?.addEventListener('click', () => { currentPage++; renderRequests(); });
+
+document.getElementById('prevPage')?.addEventListener('click', () => { 
+    if(currentPage > 1) {
+        currentPage--; 
+        renderRequests();
+    } 
+});
+
+document.getElementById('nextPage')?.addEventListener('click', () => { 
+    currentPage++; 
+    renderRequests(); 
+});
+
 document.getElementById('addServiceBtn')?.addEventListener('click', () => {
-    const name = prompt('Название услуги:'); if(!name) return;
-    const price = prompt('Цена:'); const time = prompt('Время:');
+    const name = prompt('Название услуги:'); 
+    if(!name) return;
+    const price = prompt('Цена:'); 
+    const time = prompt('Время:');
     const newId = Date.now();
     allServices.push({ id: newId, name, category: 'phones', price, time });
     localStorage.setItem('tehno_services', JSON.stringify(allServices));
     renderServices();
 });
-document.getElementById('uploadPhotoBtn')?.addEventListener('click', () => { document.getElementById('photoInput').click(); });
+
 document.getElementById('exportReviewsBtn')?.addEventListener('click', () => {
     const csv = [['Имя','Рейтинг','Текст','Дата']];
     allReviews.filter(r => r.status === 'approved').forEach(r => csv.push([r.name, r.rating, r.text, r.date]));
     const blob = new Blob(['\uFEFF' + csv.map(row => row.join(';')).join('\n')], {type:'text/csv'});
-    const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'reviews.csv'; link.click();
+    const link = document.createElement('a'); 
+    link.href = URL.createObjectURL(blob); 
+    link.download = 'reviews.csv'; 
+    link.click();
 });
-document.getElementById('themeToggle')?.addEventListener('click', () => { document.body.classList.toggle('dark-theme'); });
 
-// ВХОД
-document.getElementById('loginBtn')?.addEventListener('click', () => {
-    if(document.getElementById('loginPassword').value === ADMIN_PASSWORD) {
+document.getElementById('themeToggle')?.addEventListener('click', () => { 
+    document.body.classList.toggle('dark-theme'); 
+});
+
+document.getElementById('loginBtn')?.addEventListener('click', async () => {
+    const password = document.getElementById('loginPassword').value;
+    if(password === ADMIN_PASSWORD) {
         document.getElementById('loginOverlay').style.display = 'none';
         document.getElementById('app').style.display = 'flex';
-        loadRequests(); loadReviews(); loadServices(); loadPhotos();
+        await loadRequests();
+        loadReviews();
+        loadServices();
+        loadPhotos();
         setInterval(loadRequests, 30000);
-    } else { document.getElementById('loginError').innerText = 'Неверный пароль'; }
+    } else {
+        document.getElementById('loginError').innerText = 'Неверный пароль';
+    }
 });
+
 document.getElementById('logoutBtn')?.addEventListener('click', () => {
     document.getElementById('loginOverlay').style.display = 'flex';
     document.getElementById('app').style.display = 'none';
 });
 
-function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+function escapeHtml(str) { 
+    if(!str) return ''; 
+    return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); 
+}
