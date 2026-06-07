@@ -1,4 +1,3 @@
-// script.js — полная версия для PHP
 (function() {
     'use strict';
     
@@ -82,7 +81,7 @@
         if (closeModal) closeModal.addEventListener('click', () => modal.classList.remove('active'));
         window.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
         
-        // ===== ЗАПИСЬ (PHP версия) =====
+        // ===== ЗАПИСЬ (PHP) =====
         const quickForm = document.getElementById('quickForm');
         const modalStatus = document.getElementById('modalStatus');
         
@@ -124,7 +123,6 @@
                 if (modalStatus) modalStatus.innerHTML = 'Отправка...';
                 
                 try {
-                    // PHP путь
                     const response = await fetch('/server.php/api/request', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -181,7 +179,6 @@
                 }
                 if (businessStatus) businessStatus.innerHTML = 'Отправка...';
                 try {
-                    // PHP путь
                     const response = await fetch('/server.php/api/request', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -390,7 +387,7 @@
         
         renderMarquee();
         
-        // ===== СКРЫТЫЙ ВХОД В АДМИНКУ =====
+        // ===== СКРЫТЫЙ ВХОД =====
         let clickCount = 0;
         let clickTimer = null;
         const adminLogo = document.getElementById('adminLogoTrigger');
@@ -406,7 +403,7 @@
             });
         }
         
-        // ===== СИНХРОНИЗАЦИЯ ФОТО =====
+        // ===== ФОТО =====
         function loadPhotosFromAdmin() {
             const savedPhotos = localStorage.getItem('tehno_photos_global');
             if (savedPhotos) {
